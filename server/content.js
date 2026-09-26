@@ -117,7 +117,9 @@ export const CHAPTERS = [
     titolo: "Cercasi nessuno",
     beats: ["Settembre 2031. Marta ha mandato centoquaranta curriculum. Le hanno risposto due macchine. Zero persone. La prima: «Profilo molto interessante, la ricontatteremo». La seconda le proponeva un corso online per migliorare il profilo. A pagamento. Marta ha ventidue anni, una laurea triennale in tasca e la sensazione di essere arrivata a una festa mentre tutti se ne vanno.",
       { sig: "Prima i doppiatori e i musicisti, poi i tirocini, poi i primi impieghi. Al loro posto, niente." },
-      { counter: { to: 92, unit: " milioni", label: "di posti di lavoro spariranno entro il 2030. Ne nasceranno altri, diversi (WEF)" } },
+      // 92 annunci, uno per milione di posti (public/viz.js)
+      { bacheca: { to: 92, label: "di posti di lavoro spariranno entro il 2030. Ne nasceranno altri, diversi (WEF)",
+        legenda: "ogni annuncio strappato: un milione di posti" } },
       "Nel 2031 il primo gradino non esiste più. Il lavoro da stagista, quello in cui sbagliavi e intanto imparavi, lo fa un programma che non sbaglia e non deve imparare niente. Il problema: senza il primo gradino non si arriva al secondo, né al terzo. Le aziende cercano gente con esperienza. L'esperienza, però, non te la fa più fare nessuno. Così le carriere si spezzano prima ancora di cominciare."],
     q: "Se il primo lavoro sparisce, da dove si comincia?",
     opzione_facile: {
@@ -135,7 +137,9 @@ export const CHAPTERS = [
     beats: ["15 giugno 2032. Marta ha ventitré anni, e prima di chiedere un affitto passa la notte a cancellare i suoi vecchi post. La battuta su un politico. La foto alla manifestazione. Il commento arrabbiato di quando aveva diciannove anni. Niente di illegale. Solo cose che, viste da un algoritmo, sembrano un rischio.",
       "Il punteggio non è una legge. In Parlamento non è mai passato. Però lo guardano le banche, i proprietari di casa, chi ti fa il colloquio. Nessuno ti dice cosa togliere: ci arrivi da solo. Il trucco è tutto qui.",
       { sig: "Sistemi che danno un voto alla tua affidabilità esistono già: per l'assicurazione, per un prestito, per un affitto. La tecnologia c'è tutta. Manca solo chi li colleghi tra loro." },
-      { counter: { to: 40, unit: "%", label: "delle grandi aziende misurerà con l'AI l'umore di chi lavora, entro il 2028 (Gartner)" } },
+      // 100 badge = le grandi aziende, `to` letti dal mirino (public/viz.js)
+      { badge: { to: 40, label: "delle grandi aziende misurerà con l'AI l'umore di chi lavora, entro il 2028 (Gartner)",
+        legenda: "ogni badge: una grande azienda su cento · in quelle col mirino, l'AI legge l'umore" } },
       "Niente censori, niente divieti. Ci pensiamo da soli, prima, e gratis. Marta cancella quarantadue post, e l'affitto glielo danno. Il giorno dopo, scrivendo a un'amica, si accorge che sceglie le parole come se qualcuno la stesse leggendo."],
     q: "Un numero decide cosa puoi avere. Da domani, come ti comporti?",
     opzione_facile: {
@@ -152,7 +156,9 @@ export const CHAPTERS = [
     titolo: "L'ultima campanella",
     beats: ["Settembre 2033, primo giorno di scuola. In classe sono in sei: gli altri studiano da casa, con il tutor. Il tutor è bravissimo. Spiega la stessa cosa dieci volte senza perdere la pazienza. Capisce subito dove ti blocchi. Non ti mette mai in imbarazzo, e ti fa i complimenti quando rispondi bene. Non ti dà mai torto davanti agli altri. Anche perché gli altri non ci sono.",
       { sig: "Ognuno col suo tutor, al suo ritmo, sul suo divano. Funziona benissimo. Solo che ognuno è solo." },
-      { counter: { to: 44, unit: " milioni", label: "di insegnanti in più servono nel mondo entro il 2030 (UNESCO)" } },
+      // una sagoma per milione di insegnanti che mancano (public/viz.js)
+      { sagome: { to: 44, label: "di insegnanti in più servono nel mondo entro il 2030 (UNESCO)",
+        legenda: "ogni sagoma: un milione di insegnanti che mancano · al loro posto, uno schermo" } },
       "Un edificio pieno di ragazzi, ogni mattina, comincia a sembrare una spesa inutile. I voti salgono, i costi crollano, i genitori sono contenti. Ma c'è una cosa che nei voti non si vede, e che le statistiche non contano. La litigata con il compagno di banco. L'amicizia nata per caso durante un'interrogazione andata male. Il prof che ti ha fatto cambiare idea su chi volevi diventare."],
     q: "La scuola come luogo dove andare: la teniamo o la chiudiamo?",
     opzione_facile: {
@@ -168,7 +174,9 @@ export const CHAPTERS = [
     titolo: "Colpevole in anticipo",
     beats: ["Il punteggio che decideva gli affitti ha imparato una cosa nuova: prevedere chi commetterà un reato. Legge dove vai, cosa compri, chi frequenti, che parole usi. Poi calcola una probabilità. Sopra una certa soglia arriva una notifica: obbligo di firma, divieto di entrare in certi quartieri, conto sotto controllo. Non hai fatto niente. Secondo la macchina, però, potresti farlo.",
       { sig: "Le questure di Milano e Napoli hanno già usato software che prevedono dove e quando ci sarà una rapina." },
-      { counter: { to: 35, unit: " milioni €", label: "o più: la multa UE per chi prevede i reati dal profilo di una persona (AI Act)" } },
+      // folla d'esempio: 9 segnalati in anticipo, 2 per errore; la multa arriva in didascalia (public/viz.js)
+      { folla: { to: 35, label: "o più: la multa UE per chi prevede i reati dal profilo di una persona (AI Act)",
+        legenda: "esempio · la macchina segnala in anticipo e quasi sempre indovina: il problema è quel «quasi»" } },
       "Oggi un'AI ti ferma prima che tu faccia qualcosa. Non si stanca, non ha simpatie, e di solito indovina. I furti calano, le strade sono più tranquille, quasi tutti dicono che funziona. Il problema sta in quel «quasi», e in quel «di solito». Chi finisce dalla parte sbagliata della probabilità non ha un reato da cui difendersi. Ha solo un numero, e con un numero non si discute."],
     q: "Punire prima del reato: lo accettiamo?",
     opzione_facile: {
@@ -186,7 +194,9 @@ export const CHAPTERS = [
     beats: ["19 luglio 2035. Marta ha ventisei anni e cammina in una città che ha scelto di non guardarsi. Porta gli occhiali nuovi da tre settimane. Da allora la sua strada è più pulita, più ordinata, più bella che mai. Com'era prima, non se lo ricorda più.",
       "All'inizio i filtri toglievano la pubblicità. Poi i muri sporchi. Poi chi chiede l'elemosina all'angolo. Poi, con un aggiornamento mai chiesto, le persone e basta. L'ex. Il compagno di classe che ti ha umiliato. Il vicino che ti rovina la giornata. Spariti.",
       { sig: "Occhiali che modificano quello che vedi esistono già, e si comprano online. Cancellare una persona dall'immagine è un problema di programmazione, non di fantascienza." },
-      { counter: { to: 10, unit: " milioni", label: "di occhiali smart all'anno: la produzione prevista entro fine 2026 (EssilorLuxottica)" } },
+      // una sola via: i quattro filtri del testo tolgono le cose, poi avanti e indietro (public/viz.js)
+      { via: { to: 10, label: "di occhiali smart all'anno: la produzione prevista entro fine 2026 (EssilorLuxottica)",
+        legenda: "ogni paio: un milione di occhiali smart all'anno · i filtri tolgono dalla via quello che non vuoi vedere" } },
       "Due persone nella stessa via, ormai, non camminano più nella stessa via. Marta passa accanto a un ragazzo seduto per terra e non lo vede. Lui, invece, vede benissimo lei."],
     q: "Puoi far sparire quello che non vuoi vedere. Lo fai sparire?",
     opzione_facile: {
@@ -202,7 +212,9 @@ export const CHAPTERS = [
     titolo: "Niente da nascondere",
     beats: ["Ottobre 2036. Un'app ti regala un anno di tutto. In cambio vuole solo una cosa: tutto di te. Il battito del cuore dall'orologio. Le ore di sonno. Dove vai, cosa compri, con chi parli, cosa guardi prima di dormire. In cambio ti rende la vita più comoda: ti ricorda di bere, ti trova il ristorante giusto, sa che sei triste prima ancora di te.",
       { sig: "«Non ho niente da nascondere» è stata la frase dell'anno. Era anche vera, finché non ha smesso di esserlo." },
-      { counter: { to: 40, unit: " miliardi", label: "di oggetti connessi nel mondo entro il 2030: orologi, auto, case (IoT Analytics)" } },
+      // 8 persone × 5 oggetti: `to` miliardi di oggetti per ~8 miliardi di persone (public/viz.js)
+      { cinque: { to: 40, label: "di oggetti connessi nel mondo entro il 2030: orologi, auto, case (IoT Analytics)",
+        legenda: "ogni oggetto: un miliardo · per ogni persona sulla Terra, circa cinque oggetti connessi" } },
       "Chi ha i tuoi dati addestra le macchine. Chi addestra le macchine, decide. Decide che lavoro ti viene proposto, quanto paghi l'assicurazione, quali notizie vedi per prime, chi ti compare davanti in un'app di incontri. Niente di segreto: hai firmato tutto, con un clic, alle due di notte. Il contratto era di quarantasei pagine. Le hanno lette in pochissimi, e non sarebbe cambiato niente."],
     q: "I nostri dati: li scambiamo con tutto, o ce li teniamo?",
     opzione_facile: {
@@ -220,7 +232,9 @@ export const CHAPTERS = [
     beats: ["24 giugno 2037, la notte prima dell'esame. Marta ha ventotto anni, adesso insegna, e sa che metà dei suoi studenti stanotte non aprirà un libro. Dormiranno con una fascia sulla fronte. Domattina sapranno tutto.",
       "Non è un impianto e non fa male. Sono due ore di stimolazione mentre dormi, e al risveglio ricordi tutto come se l'avessi ripassato per sei mesi. Funziona. Costa poco. In undici paesi è legale.",
       { sig: "Stimolare la memoria durante il sonno si studia da anni nei laboratori. I risultati ci sono, piccoli ma veri. Quello che manca è solo la scala." },
-      { counter: { to: 59, unit: "%", label: "dei lavoratori dovrà imparare cose nuove entro il 2030 (WEF)" } },
+      // 100 teste = i lavoratori, a `to` si accende la fascia (public/viz.js)
+      { fasce: { to: 59, label: "dei lavoratori dovrà imparare cose nuove entro il 2030 (WEF)",
+        legenda: "ogni testa: un lavoratore su cento · 59 dovranno imparare cose nuove, e c'è chi lo farà dormendo" } },
       "Quella cosa la sai. Le seicento ore per impararla, però, non le hai mai passate. Conta? Marta se lo chiede correggendo i compiti: risposte perfette, tutte uguali. Non sbaglia più nessuno. Quasi nessuno sa dire perché una risposta è giusta. Lei ricorda ancora la notte in cui, a diciannove anni, aveva finalmente capito un teorema. Una delle notti più belle della sua vita."],
     q: "Puoi caricarti in testa una materia senza studiarla. Lo fai?",
     opzione_facile: {
@@ -237,7 +251,9 @@ export const CHAPTERS = [
     titolo: "L'oracolo sbaglia",
     beats: ["Dal giudice in poi ci eravamo convinti di una cosa: la macchina sbaglia meno di noi. Le abbiamo chiesto sempre di più. Dove costruire le scuole. Quanta acqua dare ai campi. Quali medicine comprare. Come dividere i soldi tra le regioni. L'oracolo rispondeva in pochi secondi, e le risposte funzionavano. Quasi sempre.",
       { sig: "Così le abbiamo lasciato anche le decisioni grandi, quelle che riguardano tutti. Finché un giorno ha sbagliato. Di brutto." },
-      { counter: { to: 15, unit: "%", label: "delle decisioni di lavoro quotidiane la prenderà un'AI da sola, entro il 2028 (Gartner)" } },
+      // 100 decisioni, `to` prese dall'AI; poi l'ospedale chiuso e la strada che non c'è (public/viz.js)
+      { ospedale: { to: 15, label: "delle decisioni di lavoro quotidiane la prenderà un'AI da sola, entro il 2028 (Gartner)",
+        legenda: "esempio · sulla carta tornava tutto: le strade per arrivare altrove non c'erano" } },
       "L'errore c'è stato. L'oracolo ha chiuso un ospedale che serviva trecentomila persone: secondo i suoi calcoli, quei pazienti potevano curarsi altrove. Sulla carta tornava tutto. Nella realtà, le strade per arrivare altrove non c'erano. Per settimane i numeri hanno continuato a dire che andava tutto bene. Le persone, invece, no. Adesso la domanda è una sola: se n'è accorto qualcuno? Se sì, chi ha il coraggio di dire che la macchina ha sbagliato?"],
     q: "L'oracolo ha sbagliato. Ci fidiamo ancora?",
     opzione_facile: {

@@ -94,6 +94,111 @@ h2 { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.02em;
 .v-equalizzatore .base { stroke: var(--wire); }
 .v-equalizzatore .tag { font-family: var(--font-display); font-weight: 700; font-size: 11px; letter-spacing: 0.16em; fill: var(--muted); }
 
+/* cap. 5 · la bacheca */
+.v-bacheca { --viz: var(--terra); }
+.v-bacheca .sughero { fill: rgba(236,174,49,0.1); stroke: var(--wire); }
+.v-bacheca .carta > rect:first-child, .v-bacheca .nuovo rect { fill: #f1eadc; }
+.v-bacheca .riga { fill: rgba(23,24,24,0.35); }
+.v-bacheca .puntina { fill: var(--terra); }
+.v-bacheca .nuovo text { font-family: var(--font-serif); font-size: 11px; fill: var(--bg-black); }
+.v-bacheca .nuovo .h { font-family: var(--font-display); font-weight: 800; font-size: 13px; letter-spacing: 0.12em; fill: var(--terra); }
+
+/* cap. 6 · il riconoscimento */
+.v-badge { --viz: var(--screen); }
+.v-badge .carta { fill: rgba(255,255,255,0.08); stroke: rgba(255,255,255,0.22); }
+.v-badge .foro { fill: rgba(255,255,255,0.3); }
+.v-badge .viso, .v-badge .bocca { fill: none; stroke: rgba(255,255,255,0.7); stroke-width: 1.1; stroke-linecap: round; }
+.v-badge .tratto { fill: rgba(255,255,255,0.8); }
+.v-badge .riga { fill: rgba(255,255,255,0.25); }
+.v-badge .mira, .v-badge .cursore { fill: none; stroke: var(--screen); stroke-width: 1.4; filter: url(#viz-glow); }
+.v-badge .cursore { stroke-width: 2; }
+.v-badge .umore { fill: var(--screen); }
+
+/* cap. 7 · le sagome */
+.v-sagome { --viz: var(--terra); }
+.v-sagome .assente > * { fill: none; stroke: rgba(255,255,255,0.6); stroke-width: 1.4; stroke-dasharray: 3 3; }
+.v-sagome .tablet { fill: var(--screen); filter: url(#viz-glow); }
+
+/* cap. 8 · la folla — azzurro = la macchina · terra = l'accusa · ocra = chi non aveva fatto niente */
+.v-folla .banda stop { stop-color: var(--screen); }
+.v-folla .pers circle, .v-folla .pers .corpo { fill: rgba(255,255,255,0.55); }
+.v-folla .pers.acceso circle, .v-folla .pers.acceso .corpo { fill: var(--terra); }
+.v-folla .pers.rivelato circle, .v-folla .pers.rivelato .corpo { fill: var(--ochre); }
+.v-folla .mira { fill: none; stroke: var(--screen); stroke-width: 1.4; filter: url(#viz-glow); }
+.v-folla .rivelato .mira { stroke: var(--ochre); }
+.v-folla .pct { font-family: var(--font-display); font-weight: 800; font-size: 9px; fill: var(--screen); }
+.v-folla .esito { font-family: var(--font-display); font-weight: 800; font-size: 9px; letter-spacing: 0.08em; fill: var(--terra); }
+.v-folla .errore .esito { fill: var(--ochre); }
+.v-folla .dopo { font-family: var(--font-display); font-weight: 700; font-size: 12px; letter-spacing: 0.3em; fill: var(--muted); }
+
+/* cap. 9 · la stessa via */
+.v-via { --viz: var(--screen); }
+.v-via .cielo { fill: #15222b; }
+.v-via .muro { fill: #1d2f3a; stroke: rgba(255,255,255,0.06); }
+.v-via .fin { fill: rgba(255,255,255,0.07); }
+.v-via .marciapiede { fill: #1a2a33; }
+.v-via .cordolo { stroke: rgba(255,255,255,0.18); }
+.v-via .manifesto.o rect { fill: var(--ochre); }
+.v-via .manifesto.t rect { fill: var(--terra); }
+.v-via .manifesto.s rect { fill: #8fb9d6; }
+.v-via .manifesto .scr { fill: rgba(23,24,24,0.45); }
+.v-via .scritta { fill: none; stroke: var(--terra); stroke-width: 3; stroke-linecap: round; }
+.v-via .pers, .v-via .ragazzo { fill: rgba(255,255,255,0.72); }
+.v-via .ragazzo .tazza { fill: var(--ochre); }
+.v-via .fondo-hud { fill: rgba(14,21,25,0.85); stroke: rgba(168,220,255,0.35); }
+.v-via .hud .h { font-family: var(--font-display); font-weight: 700; font-size: 9px; letter-spacing: 0.16em; fill: var(--screen); }
+.v-via .filtro text { font-family: var(--font-display); font-weight: 700; font-size: 9px; letter-spacing: 0.1em; fill: rgba(255,255,255,0.45); }
+.v-via .filtro .box { fill: none; stroke: rgba(255,255,255,0.45); }
+.v-via .filtro .spunta { fill: none; stroke: var(--bg-black); stroke-width: 1.6; opacity: 0; }
+.v-via .filtro.on .box { fill: var(--screen); stroke: var(--screen); }
+.v-via .filtro.on .spunta { opacity: 1; }
+.v-via .filtro.on text { fill: var(--screen); }
+.v-via .paio rect { fill: none; stroke: rgba(255,255,255,0.35); stroke-width: 1.5; }
+.v-via .paio path { stroke: rgba(255,255,255,0.35); stroke-width: 1.5; }
+.v-via .paio.on rect { fill: var(--screen); stroke: var(--screen); filter: url(#viz-glow); }
+.v-via .paio.on path { stroke: var(--screen); }
+
+/* cap. 10 · cinque a testa */
+.v-cinque { --viz: var(--screen); }
+.v-cinque .nuvola circle, .v-cinque .nuvola rect { fill: rgba(168,220,255,0.18); }
+.v-cinque .nuvola text { font-family: var(--font-display); font-weight: 700; font-size: 9px; letter-spacing: 0.16em; fill: var(--screen); }
+.v-cinque .ogg { fill: none; stroke: rgba(255,255,255,0.55); stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
+.v-cinque .ogg.on { stroke: var(--screen); }
+.v-cinque .uomo { fill: var(--ochre); }
+.v-cinque .filo { stroke: rgba(168,220,255,0.45); stroke-width: 1; }
+
+/* cap. 11 · le fasce */
+.v-fasce { --viz: var(--screen); }
+.v-fasce .cuscino { fill: rgba(255,255,255,0.12); }
+.v-fasce .viso { fill: rgba(255,255,255,0.7); }
+.v-fasce .occhi { fill: none; stroke: var(--bg-black); stroke-width: 1.2; stroke-linecap: round; }
+.v-fasce .fascia { fill: none; stroke: var(--screen); stroke-width: 3.2; stroke-linecap: round; filter: url(#viz-glow); }
+.v-fasce .binario { fill: rgba(255,255,255,0.12); }
+.v-fasce .carica { fill: var(--screen); }
+
+/* cap. 12 · l'ospedale — azzurro = l'AI · ocra = le persone · terra = lo sbaglio */
+.v-ospedale { --viz: var(--screen); }
+.v-ospedale .lab { font-family: var(--font-display); font-weight: 700; font-size: 9px; letter-spacing: 0.14em; fill: var(--muted); }
+.v-ospedale .tacca { fill: rgba(255,255,255,0.15); }
+.v-ospedale .tacca.on { fill: var(--screen); }
+.v-ospedale .suolo { fill: #1a2b22; }
+.v-ospedale .fiume { fill: none; stroke: #2d5f80; stroke-width: 26; stroke-linecap: round; }
+.v-ospedale .ponte { fill: #7a5a35; }
+.v-ospedale .paese { fill: var(--ochre); }
+.v-ospedale .lab-p { font-family: var(--font-display); font-weight: 800; font-size: 10px; letter-spacing: 0.12em; fill: var(--ochre); }
+.v-ospedale .h rect { fill: #f1eadc; }
+.v-ospedale .h path { fill: none; stroke: var(--terra); stroke-width: 3; }
+.v-ospedale .x path { stroke: var(--terra); stroke-width: 5; stroke-linecap: round; }
+.v-ospedale .x text, .v-ospedale .noponte text { font-family: var(--font-display); font-weight: 800; font-size: 9px; letter-spacing: 0.14em; fill: var(--terra); }
+.v-ospedale .carta-r { fill: none; stroke: var(--screen); stroke-width: 2.5; }
+.v-ospedale .carta-r.rotta { stroke: var(--terra); opacity: 0.6; }
+.v-ospedale .lab-c { font-family: var(--font-display); font-weight: 800; font-size: 10px; letter-spacing: 0.1em; fill: var(--screen); }
+.v-ospedale .noponte circle { fill: none; stroke: var(--terra); stroke-width: 2.5; }
+.v-ospedale .vera { fill: none; stroke: var(--ochre); stroke-width: 3; stroke-linecap: round; }
+.v-ospedale .lab-v { font-family: var(--font-display); font-weight: 800; font-size: 10px; letter-spacing: 0.1em; fill: var(--ochre); }
+.v-ospedale .gente { opacity: 0; }
+.v-ospedale .gente circle { fill: var(--white); }
+
 /* pannello stato */
 .delega-wrap { margin: var(--sp-md) 0; }
 .delega-lab { display: flex; justify-content: space-between; font-family: var(--font-display); font-weight: 700; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: var(--sp-xs); }
