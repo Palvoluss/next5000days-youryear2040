@@ -107,7 +107,7 @@ Serve la macchina raggiungibile dall'esterno su 80/443 e un record DNS `A` `libr
 
 **1) Node + app + persistenza**
 ```bash
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -   # Node 22: sotto, --env-file-if-exists non esiste
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -   # serve Node >= 20.12 (`--env-file-if-exists`); 22 è la LTS attuale
 sudo apt-get install -y nodejs
 git clone <repo> && cd n5d-future-book
 npm install

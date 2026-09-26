@@ -125,7 +125,7 @@ function beatHTML(b) {
       + `<div class="hg-cal">${heatCells(h.from, h.days, h.hot)}</div>`
       + `<figcaption><b class="hg-count">0</b> ${h.label}</figcaption></figure>`;
   }
-  return "";
+  return VIZ.html(b);   // i dati animati dei capitoli dal 2 in poi (viz.js)
 }
 // Calendario del caldo: una RIGA per mese (etichettata), una COLONNA per giorno 1–31.
 // I giorni caldi sono addensati a metà stagione (fine luglio) con qualche tregua: look di ondata.
@@ -178,6 +178,7 @@ function runCounters() {
     G.to(o, { n: to, duration: 1.4, ease: "power2.out", onUpdate: () => { el.childNodes[0].nodeValue = Math.round(o.n).toLocaleString("it-IT") + unit; } });
   });
   runHeatGrid();
+  VIZ.run($("chBody"));
 }
 const fmtNum = (n) => Math.round(n).toLocaleString("it-IT");
 const fmtDate = (iso) => new Intl.DateTimeFormat("it-IT", { day: "numeric", month: "long", year: "numeric" }).format(new Date(iso));
@@ -260,6 +261,7 @@ function playInterstitial(fromDays, toDays, dateISO, startISO, endISO) {
 // RENDER capitolo / voto / finale
 // ==========================================================================
 function fillChapter(s) {
+  VIZ.stop();                        // i loop del capitolo precedente non girano per tutta la serata
   $("chYear").textContent = s.chapter.anno;
   $("chTitle").textContent = s.chapter.titolo;
   let html = (s.chapter.beats || []).map(beatHTML).join("");

@@ -12,6 +12,7 @@
   --wire: rgba(255, 255, 255, 0.2);
   --ochre-a: rgba(236, 174, 49, 0.85);
   --slate-a: rgba(35, 62, 77, 0.85);
+  --screen: #a8dcff;   /* luce fredda di uno schermo: accento del dato del cap. 2 */
 
   --font-display: "Panchang", system-ui, -apple-system, sans-serif;
   --font-serif: "Sentient", Georgia, serif;
@@ -55,6 +56,43 @@ h2 { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.02em;
 .signal { border-left: 3px solid var(--ochre); padding: 0.4em 0 0.4em 1em; color: #f0dca9; font-style: italic; }
 .counter { font-family: var(--font-display); font-weight: 800; font-size: clamp(2.5rem, 8vw, 5rem); color: var(--ochre); line-height: 1; margin: 0.2em 0; }
 .counter small { display: block; font-family: var(--font-serif); font-weight: 400; font-size: 0.95rem; color: var(--muted); }
+
+/* dati animati dei capitoli (viz.js): figura + numero grande nel colore del
+   capitolo (--viz), come la heatgrid del capitolo 1 */
+.viz { margin: 1.3em 0; --viz: var(--ochre); }
+.viz svg { display: block; width: 100%; max-width: 760px; height: auto; overflow: visible; }
+.viz:not(.on) svg { visibility: hidden; }   /* fino a VIZ.run: niente lampo dello stato finale durante l'ingresso */
+.viz figcaption { margin-top: 0.7em; font-family: var(--font-serif); color: var(--muted); font-size: 0.95rem; }
+.viz .v-count { font-family: var(--font-display); font-weight: 800; color: var(--viz); font-size: 1.7rem; font-variant-numeric: tabular-nums; }
+.viz .v-leg { display: block; margin-top: 0.35em; font-size: 0.85rem; }
+.viz .v-leg i { display: inline-block; width: 0.7em; height: 0.7em; margin-right: 0.45em; border-radius: 2px; background: var(--viz); box-shadow: 0 0 6px var(--viz); vertical-align: -0.05em; }
+
+/* cap. 2 · le finestre delle tre */
+.v-finestre { --viz: var(--screen); }
+.v-finestre .fondo { fill: rgba(9,18,24,0.16); }
+.v-finestre .muro { fill: rgba(9,18,24,0.62); stroke: rgba(255,255,255,0.1); }
+.v-finestre .fin { fill: rgba(255,255,255,0.06); }
+.v-finestre .lampada { fill: var(--ochre); opacity: 0.75; }
+.v-finestre .schermo { fill: var(--screen); opacity: 0; }
+.v-finestre .suolo { stroke: var(--wire); }
+.v-finestre .ora { font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: 0.12em; fill: var(--muted); }
+
+/* cap. 3 · il fotogramma */
+.v-fotogramma { --viz: var(--terra); }
+.v-fotogramma .cornice { fill: #0b1216; stroke: var(--wire); }
+.v-fotogramma .px { fill: #fff; }
+.v-fotogramma .scan { fill: var(--terra); opacity: 0; }
+.v-fotogramma .hud text { font-family: var(--font-display); font-weight: 700; font-size: 11px; letter-spacing: 0.14em; fill: rgba(255,255,255,0.85); }
+.v-fotogramma .rec { fill: var(--terra); }
+.v-fotogramma .timbro rect { fill: rgba(23,24,24,0.35); stroke: var(--terra); stroke-width: 5; }
+.v-fotogramma .timbro text { font-family: var(--font-display); font-weight: 800; font-size: 46px; letter-spacing: 0.12em; fill: var(--terra); }
+
+/* cap. 4 · l'equalizzatore */
+.v-equalizzatore { --viz: var(--screen); }
+.v-equalizzatore .barra { fill: var(--ochre); }
+.v-equalizzatore .barra.macchina { fill: var(--screen); filter: url(#viz-glow); }
+.v-equalizzatore .base { stroke: var(--wire); }
+.v-equalizzatore .tag { font-family: var(--font-display); font-weight: 700; font-size: 11px; letter-spacing: 0.16em; fill: var(--muted); }
 
 /* pannello stato */
 .delega-wrap { margin: var(--sp-md) 0; }
