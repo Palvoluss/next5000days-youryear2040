@@ -10,7 +10,7 @@
 
 import { randomUUID } from "node:crypto";
 import {
-  CHAPTERS, BIVI, START_DATE, REF_2040, derive, esitiVisibili, contaParziali,
+  CHAPTERS, BIVI, START_DATE, REF_2040, INTRO_PASSI, derive, esitiVisibili, contaParziali,
   testoOracolo, opzioni, banda, chiudeA, apreA, componiScenario,
   etaAl, formattaEta, isDataValida
 } from "./engine.js";
@@ -30,8 +30,11 @@ export class Session {
   }
 
   reset(broadcast = true) {
-    this.phase = "lobby";               // lobby | narrating | voting | revealing | ended
+    this.phase = "lobby";               // lobby | intro | narrating | voting | revealing | ended
     this.chapterIndex = 0;
+    this.intro = 0;                      // la slide dell'intro (content.js, INTRO_PASSI)
+    this.registro = null;                // null = registro chiuso, poi il passo 0..max
+    this.voce = null;                    // la voce narrante, come la riporta il main screen
     this.participants = new Map();       // cid -> { votes: Map<n,tag>, socketId, connected }
     this.currentVotes = new Map();       // cid -> tag  (solo bivio aperto)
     this.history = [];                   // [{ n, id, anno, titolo, facile, difficile, winner }]
@@ -95,11 +98,37 @@ export class Session {
   }
 
   // ---- comandi regista ----------------------------------------------------
+  // Dal QR alle slide dell'intro; il capitolo 1 parte all'ultimo «Avanti».
   start() {
     if (this.phase !== "lobby") return;
-    this.phase = "narrating";
+    this.phase = "intro";
+    this.intro = 0;
     this.chapterIndex = 0;
     this.broadcast();
+  }
+
+  // Il registro del capitolo: si apre al passo 0 (titolo), poi un dato per
+  // passo, poi le locandine. Lo apre la fine della voce o il regista.
+  avantiRegistro() {
+    const r = this.chapter && this.chapter.registro;
+    if (this.phase !== "narrating" || !r) return;
+    if (this.registro === null) this.registro = 0;
+    else if (this.registro < r.items.length + r.pops.length) this.registro++;
+    else return;
+    this.broadcast();
+  }
+
+  // Il main screen avvisa che la voce ha finito. `n` evita che una voce in
+  // ritardo apra il registro del capitolo dopo.
+  narrazioneFinita(n) {
+    if (this.chapter && this.chapter.n === n && this.registro === null) this.avantiRegistro();
+  }
+
+  // in lettura | in pausa | bloccata: la regia deve sapere se la sala la sente
+  statoVoce(n, stato) {
+    if (!this.chapter || this.chapter.n !== n) return;
+    this.voce = String(stato).slice(0, 20);
+    this.io.to("director").emit("director:sync", this.directorView());
   }
 
   openVote() {
@@ -175,7 +204,8 @@ export class Session {
         try { p.token = await salva({ nome: p.nome, eta: p.eta, testo: p.epilogo.testo }); }
         catch (e) { console.error("epilogo non salvato:", e.message); }
       }
-      this.generazione.fatti = fatti;
+      // i salvataggi finiscono in ordine sparso: un «2» in ritardo non deve coprire il «3»
+      this.generazione.fatti = Math.max(this.generazione.fatti, fatti);
       this.io.to("director").emit("director:sync", this.directorView());
     });
     this.generazione.finita = true;
@@ -204,15 +234,22 @@ export class Session {
     this.broadcast();
   }
 
-  // Avanti: chiude la rivelazione, o passa un capitolo che non si vota
-  // (il 13 e il 14), o recupera il regista da un capitolo saltato.
+  // Avanti: scorre l'intro, chiude la rivelazione, o passa un capitolo che
+  // non si vota (il 13 e il 14), o recupera il regista da un capitolo saltato.
   skip() {
+    if (this.phase === "intro") {
+      if (++this.intro < INTRO_PASSI) return this.broadcast();
+      this.phase = "narrating";
+      return this.broadcast();
+    }
     if (this.phase !== "narrating" && this.phase !== "revealing") return;
     this.advance();
   }
 
   advance() {
     this.chapterIndex++;
+    this.registro = null;
+    this.voce = null;
     if (!this.chapter) this.endGame();
     else { this.phase = "narrating"; this.broadcast(); }
   }
@@ -248,6 +285,8 @@ export class Session {
     return {
       phase: this.phase,
       index: this.chapterIndex,
+      intro: this.phase === "intro" ? this.intro : null,
+      registro: this.phase === "narrating" ? this.registro : null,
       bivi: BIVI,
       connected: this.connectedCount(),
       participants: [...this.participants.keys()],
@@ -257,6 +296,8 @@ export class Session {
       chapter: ch ? {
         n: ch.n, anno: ch.anno, titolo: ch.titolo, data: ch.data, ruolo: ch.ruolo,
         beats: ch.beats || null,
+        audio: ch.audio || null,
+        registro: ch.registro || null,
         votabile: !!ch.votabile,
         mostra_live: !!ch.mostra_live,
         // il capitolo 12 mostra la variante determinata da I5
@@ -292,6 +333,11 @@ export class Session {
     const scelta = ultimo.winner === "facile" ? ch.opzione_facile : ch.opzione_difficile;
     const it = chiudeA(ultimo.n);
     const stato = it ? w.intrecci[it.id] : null;
+    // le due scelte della sala che hanno saldato l'intreccio, a parole
+    const decisione = (n) => {
+      const c = PER_N.get(n);
+      return { anno: c.anno, titolo: c.titolo, label: (w.winners[n] === "facile" ? c.opzione_facile : c.opzione_difficile).label };
+    };
     return {
       winner: ultimo.winner,
       label: scelta.label,
@@ -300,7 +346,8 @@ export class Session {
       difficile: ultimo.difficile,
       // niente esito su un capitolo che non chiude niente: la maggior parte
       // dei capitoli pianta e non raccoglie
-      esito: it && stato ? { id: it.id, asse: it.asse, stato, ...it.esiti[stato] } : null,
+      esito: it && stato ? { id: it.id, asse: it.asse, stato, ...it.esiti[stato],
+        decisioni: [decisione(it.nodo_apertura), decisione(it.nodo_chiusura)] } : null,
       // Mezza figura: solo un booleano. Niente id, niente asse, niente stato —
       // quello che non viene mandato non si può leggere dagli strumenti del
       // browser, e il segno non deve essere deducibile in nessun modo (§4.6).
@@ -313,7 +360,8 @@ export class Session {
   directorView() {
     const w = this.world;
     const ch = this.chapter;
-    const prox = CHAPTERS[this.chapterIndex + 1];
+    // prima del libro il prossimo è il capitolo 1, non il 2
+    const prox = this.phase === "lobby" || this.phase === "intro" ? CHAPTERS[0] : CHAPTERS[this.chapterIndex + 1];
     const nodo = (it) => it ? { id: it.id, asse: it.asse } : null;
     return {
       ...this.mainView(),
@@ -326,6 +374,7 @@ export class Session {
       chiude: ch ? nodo(chiudeA(ch.n)) : null,
       prossimo: prox ? { n: prox.n, anno: prox.anno, titolo: prox.titolo, votabile: !!prox.votabile, ruolo: prox.ruolo } : null,
       puoRiaprire: this.history.length > 0,
+      voce: this.voce,
       generazione: this.generazione,
       epiloghiRivelati: this.epiloghiRivelati,
       // quanti hanno lasciato un nome: senza, l'epilogo si apre con «Tu»
@@ -339,7 +388,9 @@ export class Session {
       options: this.phase === "voting" ? opzioni(this.chapter) : null,
       // «si può cambiare idea fino allo scadere» (§5) vuole che si sappia quando scade
       voteRestaMs: this.voteEndsAt ? Math.max(0, this.voteEndsAt - Date.now()) : null,
-      voteDurata: this.chapter && this.chapter.votabile ? this.chapter.durata_voto_sec : null
+      voteDurata: this.chapter && this.chapter.votabile ? this.chapter.durata_voto_sec : null,
+      // la card dell'intreccio appena saldato: la mezza figura resta solo sul ledwall
+      esito: this.phase === "revealing" ? this.revealView(this.world)?.esito || null : null
     };
   }
 

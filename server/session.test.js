@@ -4,7 +4,7 @@
 // — e a verificare il doppio binario sala/individuo e la rivelazione.
 import assert from "node:assert";
 import { Session } from "./session.js";
-import { CHAPTERS, VOTABILI, INTRECCI, FALLBACK } from "./engine.js";
+import { CHAPTERS, VOTABILI, INTRECCI, FALLBACK, INTRO_PASSI } from "./engine.js";
 import { leggi, pulisciVecchi, fallback } from "./epilogo.js";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -21,13 +21,37 @@ const CHIUDONO = INTRECCI.filter(i => i.nodo_chiusura != null).map(i => i.nodo_c
 // i capitoli che ne aprono uno: lì va la mezza figura
 const APRONO = INTRECCI.map(i => i.nodo_apertura);
 
+// Inizia → le slide dell'intro → capitolo 1
+const parti = (x) => { x.start(); while (x.phase === "intro") x.skip(); };
+
 const s = new Session(io);
 const [a, b, c] = ["sa", "sb", "sc"].map(id => s.addParticipant(null, socket(id)));
 assert.equal(s.connectedCount(), 3);
 
 s.start();
+assert.equal(s.phase, "intro", "dopo il QR vengono le slide, non il capitolo 1");
+let passiIntro = 1;
+while (s.phase === "intro") { assert.equal(s.mainView().intro, passiIntro - 1); s.skip(); passiIntro++; }
+assert.equal(passiIntro - 1, INTRO_PASSI);
 assert.equal(s.phase, "narrating");
 assert.equal(s.chapter.n, 1);
+
+// registro del capitolo 1: chiuso finché la voce non finisce, poi un passo
+// per «Avanti»; una voce in ritardo di un altro capitolo non lo tocca
+assert.equal(s.mainView().registro, null);
+s.narrazioneFinita(2);
+assert.equal(s.registro, null);
+s.statoVoce(2, "bloccata");
+assert.equal(s.directorView().voce, null, "lo stato di una voce di un altro capitolo non conta");
+s.statoVoce(1, "in lettura");
+assert.equal(s.directorView().voce, "in lettura");
+s.narrazioneFinita(1);
+assert.equal(s.registro, 0);
+s.narrazioneFinita(1);
+assert.equal(s.registro, 0, "la fine della voce apre, non scorre");
+const maxReg = CHAPTERS[0].registro.items.length + CHAPTERS[0].registro.pops.length;
+for (let i = 0; i < maxReg + 3; i++) s.avantiRegistro();
+assert.equal(s.registro, maxReg, "oltre l'ultima locandina non si va");
 
 // a e b votano comodo, c vota sempre difficile: c finisce sempre in minoranza
 for (const ch of VOTABILI) {
@@ -48,8 +72,15 @@ for (const ch of VOTABILI) {
   assert.equal(r.facile, 2);
   assert.equal(r.difficile, 1, "la forbice finale si vede sempre alla rivelazione");
   assert.ok(r.label && r.costo, "serve la scelta vinta e il suo costo nascosto");
-  if (CHIUDONO.includes(ch.n)) assert.ok(r.esito, `cap. ${ch.n} chiude un intreccio: serve l'esito`);
-  else assert.equal(r.esito, null, `cap. ${ch.n} non chiude niente: nessun esito`);
+  if (CHIUDONO.includes(ch.n)) {
+    assert.ok(r.esito, `cap. ${ch.n} chiude un intreccio: serve l'esito`);
+    assert.equal(r.esito.decisioni.length, 2, `cap. ${ch.n}: l'esito porta le due scelte che l'hanno saldato`);
+    assert.equal(r.esito.decisioni[1].label, r.label, `cap. ${ch.n}: la seconda scelta è quella appena vinta`);
+    assert.deepEqual(s.deviceViewGeneric().esito, r.esito, `cap. ${ch.n}: il telefono riceve la stessa card`);
+  } else {
+    assert.equal(r.esito, null, `cap. ${ch.n} non chiude niente: nessun esito`);
+    assert.equal(s.deviceViewGeneric().esito, null, `cap. ${ch.n}: al telefono niente card`);
+  }
 
   // mezza figura sui capitoli che aprono, e mai insieme a un esito
   const attesoParziale = !CHIUDONO.includes(ch.n) && APRONO.includes(ch.n);
@@ -116,7 +147,7 @@ assert.equal(s.consensusCount().same + s.consensusCount().diverge, 3);
 // ---- chi entra a metà serata (Patch §5) ----------------------------------
 const s2 = new Session(io);
 const early = s2.addParticipant(null, socket("s1"));
-s2.start();
+parti(s2);
 let tardi = null;
 for (const ch of VOTABILI) {
   s2.openVote();
@@ -135,7 +166,7 @@ assert.equal(pt.indice_personale, 0);
 // ---- riapri voto: con lo stato derivato è un pop di history --------------
 const s3 = new Session(io);
 const solo = s3.addParticipant(null, socket("s1"));
-s3.start();
+parti(s3);
 s3.openVote(); s3.vote(solo, "facile"); s3.closeVote();
 assert.equal(s3.phase, "revealing");
 assert.equal(s3.world.indice, 100);
@@ -160,7 +191,7 @@ assert.equal(s3.history.length, 0);
 // ---- capitolo a zero voti: la serata non si blocca ----------------------
 const s4 = new Session(io);
 s4.addParticipant(null, socket("s1"));
-s4.start();
+parti(s4);
 s4.openVote(); s4.closeVote();
 assert.equal(s4.history[0].winner, "facile", "zero voti → facile, e si va avanti");
 assert.deepEqual([s4.mainView().reveal.facile, s4.mainView().reveal.difficile], [0, 0]);
@@ -171,7 +202,7 @@ assert.equal(s4.world.indice, null, "un capitolo senza voti non produce una quot
 // ogni capitolo, in ogni fase, produce viste che non esplodono
 const s5 = new Session(io);
 s5.addParticipant(null, socket("s1"));
-s5.start();
+parti(s5);
 for (let i = 0; i < CHAPTERS.length; i++) {
   s5.mainView(); s5.directorView(); s5.deviceViewGeneric();
   if (s5.chapter.votabile) { s5.openVote(); s5.mainView(); s5.closeVote(); s5.mainView(); s5.directorView(); }
@@ -184,7 +215,7 @@ s5.mainView(); s5.directorView();
 const sd = new Session(io);
 sd.addParticipant(null, socket("s1"));
 assert.equal(sd.directorView().puoRiaprire, false, "in lobby non c'è niente da riaprire");
-sd.start();
+parti(sd);
 for (const ch of VOTABILI) {
   const d = sd.directorView();
   assert.equal(d.chapter.n, ch.n);
@@ -216,7 +247,7 @@ assert.equal(sd.directorView().chapter, null, "a fine serata la regia non esplod
 // la variante del capitolo 12 dipende da I5 ed è quella che il narratore legge
 const sv = new Session(io);
 const lettore = sv.addParticipant(null, socket("s1"));
-sv.start();
+parti(sv);
 for (const ch of VOTABILI) {
   sv.openVote();
   sv.vote(lettore, ch.n === 7 ? "facile" : "difficile");   // I5 apre al 7, chiude all'11
@@ -233,7 +264,7 @@ for (const ch of VOTABILI) {
 // ---- forbice live: il gate di mostra_live (§2.3) -------------------------
 const s6 = new Session(io);
 const occhi = s6.addParticipant(null, socket("s1"));
-s6.start();
+parti(s6);
 for (const ch of VOTABILI) {
   s6.openVote();
   s6.vote(occhi, "facile");
@@ -260,7 +291,7 @@ assert.equal(VOTABILI.filter(c => c.mostra_live).length, 3, "live acceso su deep
 // ---- timer: il voto si chiude da sé (§5, e §9 se il cruscotto cade) -----
 const s7 = new Session(io);
 const tizio = s7.addParticipant(null, socket("s1"));
-s7.start();
+parti(s7);
 // durata reale = 60s: non aspettabile in un test. La si abbassa sul capitolo.
 const cap1 = CHAPTERS[0], durataVera = cap1.durata_voto_sec;
 cap1.durata_voto_sec = 0.2;
@@ -287,7 +318,7 @@ cap1.durata_voto_sec = durataVera;   // ripristino: i dati sono condivisi tra i 
 // riaprire un voto non riarma il timer: da lì decide il regista
 const s8 = new Session(io);
 s8.addParticipant(null, socket("s1"));
-s8.start();
+parti(s8);
 s8.openVote(); s8.closeVote();
 s8.reopenVote();
 assert.equal(s8.phase, "voting");
@@ -296,7 +327,7 @@ assert.equal(s8.voteEndsAt, null, "riaperto a mano: nessuna chiusura automatica 
 // un capitolo con durata 0 non arma nessun timer
 const s9 = new Session(io);
 s9.addParticipant(null, socket("s1"));
-s9.start();
+parti(s9);
 const d0 = CHAPTERS[0].durata_voto_sec;
 CHAPTERS[0].durata_voto_sec = 0;
 s9.openVote();
@@ -322,7 +353,7 @@ assert.equal(se.participants.get(bruto).nome.length, 30, "il nome è tagliato a 
 assert.equal(se.participants.get(bruto).nascita, null, "il 30 febbraio non passa");
 assert.equal(se.directorView().conNome, 2, "due su tre hanno lasciato un nome");
 
-se.start();
+parti(se);
 for (const ch of VOTABILI) {
   se.openVote();
   se.vote(ada, "difficile"); se.vote(senzaDati, "facile"); se.vote(bruto, "facile");

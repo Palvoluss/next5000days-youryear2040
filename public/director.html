@@ -41,18 +41,27 @@
     <div class="muted" id="chNodo" style="font-size:0.8rem;margin-top:0.3em"></div>
     <div class="row">
       <button class="btn" id="bStart">▶ Inizia</button>
-      <button class="btn" id="bOpen">Apri voto</button>
-      <button class="btn" id="bClose">Chiudi voto</button>
+      <!-- UN solo pulsante per andare avanti: dove c'è da votare diventa Apri,
+           poi Chiudi, e solo dopo Avanti. Un tocco sbagliato non salta un voto. -->
+      <button class="btn" id="bPasso" style="min-width:12em">Avanti ▷</button>
       <button class="btn ghost" id="bReopen">↺ Riapri voto</button>
       <button class="btn ghost" id="bTieF">Forza ↘ facile</button>
       <button class="btn ghost" id="bTieD">Forza ↗ difficile</button>
-      <button class="btn" id="bSkip">Avanti ▷</button>
       <button class="btn ghost" id="bReset">Reset</button>
     </div>
     <div class="row" style="margin-top:0">
       <button class="btn" id="bEpiloghi">📱 Rivela epiloghi</button>
     </div>
     <div class="muted" id="epiTxt" style="font-size:0.8rem"></div>
+  </div>
+
+  <!-- La voce la suona lo schermo principale; qui si comanda e si vede se va. -->
+  <div class="card" id="voceCard" style="display:none">
+    <div class="year">Voce narrante</div>
+    <div class="row" style="align-items:center;margin-bottom:0">
+      <button class="btn" id="bVoce">▶ Avvia voce</button>
+      <span class="muted" id="voceTxt" style="font-size:0.85rem"></span>
+    </div>
   </div>
 
   <div class="card kpi">
@@ -116,28 +125,56 @@
 
   // I comandi si accendono solo quando hanno senso: sul palco un pulsante che
   // non fa niente è indistinguibile da un pulsante che non ha funzionato.
+  // Il passo successivo, letto dallo stato.
+  function passo(s) {
+    const p = s && s.phase;
+    if (p === "intro") return { label: "Avanti ▷", ev: "director:skip" };
+    // il registro va scorso tutto prima del voto: la voce lo apre da sola,
+    // il pulsante lo apre comunque (voce saltata, audio bloccato)
+    const r = p === "narrating" && s.chapter && s.chapter.registro;
+    if (r) {
+      const max = r.items.length + r.pops.length;
+      if (s.registro == null) return { label: "▤ Apri registro", ev: "director:registro" };
+      if (s.registro < max) return { label: `Registro ${s.registro + 1}/${max} ▷`, ev: "director:registro" };
+    }
+    if (p === "voting") return { label: "■ Chiudi voto", ev: "director:closeVote" };
+    if (p === "narrating" && s.chapter && s.chapter.votabile) return { label: "● Apri voto", ev: "director:openVote" };
+    if (p === "narrating" || p === "revealing") return { label: "Avanti ▷", ev: "director:skip" };
+    return { label: "Avanti ▷", ev: null };
+  }
+  // Lo stesso pulsante cambia mestiere sotto il dito: un doppio tocco aprirebbe
+  // e richiuderebbe il voto. Dopo ogni pressione resta spento un attimo.
+  const PAUSA_PASSO_MS = 1500;
+  let fermoFino = 0;
+
   function abilita() {
     const s = ultimo, p = s && s.phase;
     const on = (id, v) => $(id).disabled = !(online && v);
+    const ps = passo(s);
+    $("bPasso").textContent = ps.label;
     on("bStart",  p === "lobby");
-    on("bOpen",   p === "narrating" && !!(s.chapter && s.chapter.votabile));
-    on("bClose",  p === "voting");
+    on("bPasso",  !!ps.ev && Date.now() >= fermoFino);
     on("bTieF",   p === "voting");
     on("bTieD",   p === "voting");
     on("bReopen", !!(s && s.puoRiaprire));
-    on("bSkip",   p === "narrating" || p === "revealing");
     on("bReset",  true);
+    on("bVoce",   true);
     // si accende solo quando c'è davvero qualcosa da rivelare
     on("bEpiloghi", !!(s && s.generazione && s.generazione.finita && !s.epiloghiRivelati));
   }
   abilita();
   $("bStart").onclick = () => emit("director:start");
-  $("bOpen").onclick = () => emit("director:openVote");
-  $("bClose").onclick = () => emit("director:closeVote");
+  $("bPasso").onclick = () => {
+    const ps = passo(ultimo);
+    if (!ps.ev) return;
+    emit(ps.ev);
+    fermoFino = Date.now() + PAUSA_PASSO_MS;
+    abilita(); setTimeout(abilita, PAUSA_PASSO_MS);
+  };
   $("bReopen").onclick = () => emit("director:reopenVote");
+  $("bVoce").onclick = () => emit("director:voce", { play: !(ultimo && ultimo.voce === "in lettura") });
   $("bTieF").onclick = () => emit("director:closeVote", { option: "facile" });
   $("bTieD").onclick = () => emit("director:closeVote", { option: "difficile" });
-  $("bSkip").onclick = () => emit("director:skip");
   $("bReset").onclick = () => { if (confirm("Azzerare la sessione?")) emit("director:reset"); };
   // irreversibile per come è messa in scena: novanta schermi si accendono e basta
   $("bEpiloghi").onclick = () => { if (confirm("Accendere adesso tutti i telefoni?")) emit("director:rivelaEpiloghi"); };
@@ -162,11 +199,13 @@
   socket.on("director:sync", (s) => {
     ultimo = s; abilita();
     $("phase").textContent = s.phase;
-    $("chLabel").textContent = s.chapter
+    $("chLabel").textContent = s.phase === "intro"
+      ? (s.intro === 0 ? "slide: speaker" : `slide: manuale d'istruzioni ${s.intro - 1}/6`)
+      : s.chapter
       ? `cap. ${s.chapter.n}/14 · ${s.chapter.anno} — ${s.chapter.titolo}${s.chapter.votabile ? "" : " (non si vota)"}`
       : "fine";
     // pianta o raccoglie? decide il ritmo che il narratore deve tenere
-    $("chNodo").textContent = !s.chapter ? ""
+    $("chNodo").textContent = !s.chapter || s.phase === "intro" ? ""
       : s.chiude ? `chiude ${s.chiude.id} · asse ${s.chiude.asse} — qui c'è un esito da annunciare`
       : s.apre ? `apre ${s.apre.id} · asse ${s.apre.asse} — pianta e basta, si raccoglie più avanti`
       : "non apre né chiude nessun intreccio";
@@ -176,6 +215,12 @@
       : null;
     $("leggiCard").style.display = daLeggere ? "" : "none";
     if (daLeggere) $("leggiDir").textContent = daLeggere;
+    // la voce: c'è solo mentre si legge il capitolo, prima del registro
+    $("voceCard").style.display = s.phase === "narrating" && s.chapter && s.chapter.audio && s.registro == null ? "" : "none";
+    $("bVoce").textContent = s.voce === "in lettura" ? "❚❚ Pausa voce" : "▶ Avvia voce";
+    $("voceTxt").textContent = s.voce === "bloccata"
+      ? "Il browser dello schermo ha bloccato l'audio: clicca una volta sullo schermo principale e parte."
+      : s.voce || "in attesa dello schermo principale";
     $("nextLabel").textContent = s.prossimo
       ? `cap. ${s.prossimo.n} · ${s.prossimo.anno} — ${s.prossimo.titolo}`
       : "niente: dopo questo la serata è finita";

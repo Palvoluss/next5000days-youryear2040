@@ -139,7 +139,13 @@ console.log(`join ok: ${joined}/${connected}\n`);
 // ---- flusso completo -----------------------------------------------------
 const t0 = now();
 director.emit("director:start");
-await waitSync((s) => s.phase === "narrating", "l'inizio della serata");
+await waitSync((s) => s.phase === "intro", "le slide dell'intro");
+// le slide dell'intro, una per «Avanti», fino al capitolo 1
+while (dsync.phase === "intro") {
+  const passo = dsync.intro;
+  director.emit("director:skip");
+  await waitSync((s) => s.phase !== "intro" || s.intro !== passo, "la slide dopo");
+}
 const rounds = dsync.bivi;
 let ended = false;
 

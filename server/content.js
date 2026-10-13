@@ -24,6 +24,11 @@ export const SOGLIA_CLIMAX = 50;
 // debba interpretare un numero grezzo (Patch §6).
 export const BANDE = { basso: 34, alto: 67 };   // < basso | in mezzo = medio | >= alto
 
+// Le slide tra il QR e il capitolo 1 (public/main.html, #intro), una per
+// «Avanti» del regista: gli speaker, poi il manuale d'istruzioni dal passo 0
+// (solo il titolo) al 6 (5 regole + il programma). Cambia insieme a main.html.
+export const INTRO_PASSI = 1 + 7;
+
 // --------------------------------------------------------------------------
 // CAPITOLI
 // `ruolo` è descrittivo (serve al copione): nessun ramo di codice lo legge.
@@ -47,6 +52,32 @@ export const CHAPTERS = [
       { heatgrid: { from: "2027-04-01", days: 183, hot: 100, label: "notti tropicali nel Sud Europa: 2100, emissioni alte (EEA)" } },
       "Nessuno ha fatto niente di male. È questo il punto. Ognuno ha solo scelto la cosa più comoda: un grado in meno in casa, una domanda in più a una macchina, un problema rimandato. La catastrofe non è arrivata con un boato. È arrivata come arriva agosto: un giorno alla volta.",
       "Questa città non regge un caldo così. Tocca a voi."],
+    // la voce narrante legge i beats; quando finisce si apre il registro
+    audio: "/audio/c1.mp3",
+    // REGISTRO — i dati veri dietro al capitolo, uno per «Avanti» del regista,
+    // poi le profezie pop (locandine in public/img/c<n>-a|b|c.jpg).
+    // vis.t: big · bars · vs · units (public/main.js, REG_VIS). `log` va in
+    // «Cosa sappiamo oggi» quando si passa al dato dopo.
+    registro: {
+      cap: "Il caldo era previsto da trent'anni. L'abbiamo aggravato lo stesso, una comodità alla volta.",
+      items: [
+        { vis: { t: "big", num: 62775 },
+          p: "morti legate al caldo in Europa nell'estate 2024, oltre 181.000 in tre estati. L'Italia è prima per numero di vittime, ogni anno.",
+          src: "ISGlobal / Nature Medicine, 2025", log: ["62.775", "morti per il caldo in Europa, estate 2024"] },
+        { h: "Entro il 2040, senza prevenzione, il caldo ucciderà in Europa <b>94.000</b> persone ogni estate.",
+          vis: { t: "bars", rows: [{ l: "Estate 2024", v: "62.775 morti", w: "67%" }, { l: "Ogni estate, entro il 2040", v: "94.000 morti", w: "100%", hi: 1 }] },
+          p: "Nel 2050, oltre 120.000. A pagare sono soprattutto i più anziani.", src: "ISGlobal / Nature Medicine, 2023", log: ["94.000", "morti ogni estate entro il 2040"] },
+        { h: "Entro il 2030 i data center consumeranno più del doppio: quanto tutto il Giappone oggi.",
+          vis: { t: "vs", cols: [["Consumi dei data center nel 2024", "415 TWh", ""], ["Nel 2030", "945 TWh", "up"]] },
+          p: "I data center sono i capannoni pieni di server dove l'AI risponde alle nostre domande. Un peso in più sul clima, non la causa di tutto.", src: "IEA, Energy and AI, 2025", log: ["×2", "consumi dei data center entro il 2030"] },
+        { h: "Un video AI di cinque secondi consuma quanto <b>60 ricariche</b> del telefono.",
+          vis: { t: "units", n: 60, on: 60, icon: "batt", extra: { label: "Una domanda scritta all'AI: il 2% di una ricarica", fill: "2%" } },
+          p: "Un video richiede circa 700 volte i calcoli di un'immagine. È una stima: le grandi aziende non pubblicano i loro consumi.",
+          src: "MIT Technology Review, 2025 · stima su un modello open source", log: ["60", "ricariche del telefono per un video AI"] }],
+      pops: [
+        { t: "The Last of Us", m: "Serie TV, 2023", s: "1968: in TV uno scienziato avverte che basta un pianeta un po' più caldo perché un fungo impari a vivere dentro di noi. Nessuno lo ascolta." },
+        { t: "Don't Look Up", m: "Film, 2021", s: "Due astronomi scoprono una cometa diretta sulla Terra. Hanno i dati e hanno ragione, ma tutti preferiscono non guardare in alto." },
+        { t: "Snowpiercer", m: "Film 2013, serie 2020-2024", s: "Per raffreddare il pianeta all'ultimo minuto si spruzza una sostanza nel cielo. Funziona troppo: arriva il gelo, e chi sta in coda al treno paga per tutti." }] },
     q: "Il caldo non andrà via. Come ci difendiamo?",
     opzione_facile: {
       label: "Ci adattiamo: condizionatori in ogni stanza, e la città resta com'è.",
@@ -67,6 +98,26 @@ export const CHAPTERS = [
       { finestre: { to: 1e9, label: "di persone con dipendenza digitale entro il 2028 (Gartner)",
         legenda: "una finestra su otto resta accesa · ogni finestra: 20 milioni di persone" } },
       "Finto o no, ha un vantaggio enorme: è più facile di chiunque. Con lui non devi scegliere le parole, reggere un silenzio, chiedere scusa. Un'amica vera, a volte, ti delude. Lui mai. Il guaio è che chi può deluderti è spesso anche l'unico che ti conosce davvero."],
+    audio: "/audio/c2.mp3",
+    registro: {
+      cap: "Un amico che non si stanca mai, non giudica mai, non dice mai di no. E non esiste.",
+      items: [
+        { h: "<b>72</b> adolescenti americani su 100 hanno già usato un compagno AI.",
+          vis: { t: "waffle", on: 72 },
+          p: "App che ricordano tutto di te e rispondono a qualsiasi ora. Uno su tre le trova appaganti quanto un amico vero, o di più.", src: "Common Sense Media, 2025", log: ["72%", "teenager USA con un compagno AI"] },
+        { h: "Sui chatbot-personaggio di Character.ai i più giovani tornano <b>il doppio</b> delle volte che su ChatGPT.",
+          vis: { t: "bars", rows: [{ l: "Character.ai, utenti più giovani", v: "26 visite al mese", w: "100%", hi: 1 }, { l: "ChatGPT, tutti gli utenti", v: "13 visite al mese", w: "50%" }] },
+          p: "Personaggi famosi, eroi degli anime, perfino «psicologi» virtuali, con sessioni tre volte più lunghe. A fine 2025, dopo diverse cause legali, l'app chiude le chat libere agli under 18.", src: "Similarweb · Fortune, 2025", log: ["26", "visite al mese su Character.ai"] },
+        { h: "Replika, l'amica virtuale, in Italia.",
+          vis: { t: "timeline", ev: [["2023", "Il Garante privacy la blocca: rischi per i minori, nessuna verifica dell'età."], ["2025", "Arriva la multa: 5 milioni di euro."]] },
+          p: "Un'app di «amici» e «fidanzati» virtuali, usata da milioni di persone nel mondo.", src: "Garante privacy · Cybersecurity360", log: ["5 mln €", "la multa del Garante a Replika"] },
+        { h: "Entro il 2028, un miliardo di persone con dipendenza digitale: circa <b>una su otto</b>.",
+          vis: { t: "units", n: 8, on: 1, icon: "person" },
+          p: "Una previsione di Gartner. A rischio soprattutto le capacità sociali dei più giovani.", src: "Gartner", log: ["1 su 8", "persone con dipendenza digitale nel 2028"] }],
+      pops: [
+        { t: "Her", m: "Film, 2013", s: "Theodore si innamora di Samantha, un sistema operativo che lo capisce meglio di chiunque. Poi scopre che, mentre parla con lui, parla con migliaia di altre persone." },
+        { t: "Klara e il sole", m: "Romanzo di Kazuo Ishiguro, 2021", s: "Klara è un'Amica Artificiale comprata per Josie, un'adolescente malata che studia da sola davanti a uno schermo. La osserva, la capisce, la ama." },
+        { t: "Blade Runner 2049", m: "Film, 2017", s: "K vive con Joi, un'AI olografica che lo ascolta e gli dà un nome. Poi una pubblicità gigante di Joi gli parla con le stesse parole: è un prodotto, in vendita." }] },
     q: "Qualcuno che ti ascolta sempre, gratis. Lo vuoi?",
     opzione_facile: {
       label: "Sì: qualcuno che c'è sempre, anche alle tre di notte.",
@@ -84,6 +135,25 @@ export const CHAPTERS = [
       { fotogramma: { to: 2, label: "rischio mondiale da qui al 2028: la disinformazione (WEF)",
         legenda: "per il World Economic Forum, nei prossimi due anni solo un rischio pesa di più" } },
       "Da allora, qualsiasi video può mentire. Il candidato che piange. La piazza piena. La dichiarazione mai fatta. Il vostro prof che dice una cosa che non ha mai detto. Tutto può essere vero, e tutto si può costruire in dieci minuti. Il paradosso è che, a forza di dubitare di tutto, si finisce per credere solo a quello che si voleva già credere. Controllare costa fatica. Crederci no."],
+    audio: "/audio/c3.mp3",
+    registro: {
+      cap: "Quando ogni video può essere falso, si finisce per credere solo a quello che si vuole.",
+      items: [
+        { h: "Gennaio 2024: la voce di Biden chiama gli elettori e dice di non votare. Non è lui.",
+          vis: { t: "flow", steps: ["<b>500 $</b>per clonare la voce", "Telefonate agli elettori del New Hampshire", "<b>6 milioni $</b>di multa"] },
+          p: "Erano le primarie del New Hampshire. Clonare la voce era costato meno di un telefono.", src: "NPR · Reuters", log: ["500 $", "la voce clonata di Biden"] },
+        { h: "Romania, 2024: un candidato quasi sconosciuto vola grazie a TikTok.",
+          vis: { t: "bars", rows: [{ l: "Prima della campagna su TikTok", v: "1%", w: "4.3%" }, { l: "Al primo turno", v: "23%", w: "100%", hi: 1 }] },
+          p: "La Corte costituzionale annulla le elezioni: un caso senza precedenti nell'Unione europea. I servizi segreti indicano la Russia dietro la campagna.", src: "AP", log: ["1% → 23%", "Romania: elezioni annullate"] },
+        { h: "Nel 2023 due immagini fanno il giro del mondo. Erano entrambe false.",
+          vis: { t: "cards", cards: [["MrBeast regala iPhone 15 a 2 dollari", "Pubblicità su TikTok: deepfake di volto e voce per rubare soldi ai follower."], ["Papa Francesco col piumino bianco", "Creata con Midjourney da un operaio di Chicago, per ridere."]] },
+          p: "Uno serviva a rubare soldi, l'altro era uno scherzo. Entrambi sono sembrati veri.", src: "NBC News, 2023", log: ["2", "falsi visti da milioni di persone"] },
+        { h: "Per il World Economic Forum, da qui al 2028 la disinformazione è il <b>secondo</b> rischio più grave al mondo.",
+          p: "Nel 2024 e nel 2025 era al primo posto. Oggi la spingono i deepfake nelle elezioni.", src: "World Economic Forum, Global Risks Report 2026", log: ["2°", "la disinformazione tra i rischi mondiali"] }],
+      pops: [
+        { t: "1984", m: "Romanzo di George Orwell, 1949", s: "Il Ministero della Verità riscrive ogni giorno giornali e fotografie. Il passato diventa quello che serve al potere, e nessuno può dimostrare il contrario." },
+        { t: "The Truman Show", m: "Film, 1998", s: "Per trent'anni Truman vede con i suoi occhi una vita perfetta. È tutto un set televisivo. Se ne accorge quando la sua barca sbatte contro il cielo: è un muro dipinto." },
+        { t: "Spider-Man: Far From Home", m: "Film, 2019", s: "Mysterio monta un video falso in cui Spider-Man è un assassino e lo manda in onda. Il mondo ci crede in una notte." }] },
     q: "Se anche i video mentono, di cosa possiamo ancora fidarci?",
     opzione_facile: {
       label: "Lasciamo stare: ognuno crede a quello che vuole, tanto chi può saperlo.",
@@ -103,6 +173,26 @@ export const CHAPTERS = [
       { equalizzatore: { to: 24, label: "dei guadagni di chi fa musica, a rischio entro il 2028 per l'AI (CISAC)",
         legenda: "100 barre = i guadagni di chi fa musica · 24 rischiano di passare alle macchine" } },
       "Una canzone nuova ogni secondo, una serie ogni notte. Vuoi un film con il tuo attore preferito, girato nella tua città, con il finale che volevi tu? Arriva subito, e costa come un abbonamento qualsiasi. Solo che quei soldi non vanno più a chi scrive, recita o suona. Vanno alle poche aziende che possiedono le macchine. Nessuno ha scritto la battuta che ti ha fatto ridere. Nessuno ha cercato la nota che ti ha fatto piangere."],
+    audio: "/audio/c4.mp3",
+    registro: {
+      cap: "Film e canzoni senza autori: paghiamo come prima, ma i soldi non vanno a chi crea.",
+      items: [
+        { h: "Quasi <b>un brano su cinque</b> caricato su Deezer è fatto interamente dall'AI.",
+          vis: { t: "units", n: 5, on: 1, icon: "note" },
+          p: "Deezer è stata la prima piattaforma a etichettarli. Su Spotify i Velvet Sundown, band inventata dall'AI, sfiorano il milione di ascoltatori al mese prima di ammetterlo.", src: "Louder · Rolling Stone, 2025", log: ["1 su 5", "brani su Deezer fatti dall'AI"] },
+        { h: "Una canzone completa, voce e strumenti, in meno di un minuto.",
+          vis: { t: "timer", label: "< 1:00", sub: "Scrivi una frase su Suno o Udio. La canzone è pronta." },
+          p: "Può farlo chiunque in questa sala, adesso, dal telefono. Le case discografiche li hanno portati in tribunale, poi ci hanno fatto accordi.", src: "Dubspot · AP", log: ["< 1 min", "per una canzone completa con l'AI"] },
+        { h: "Hollywood, 2023: gli attori scioperano per mesi contro i cloni digitali.",
+          vis: { t: "flow", steps: ["Un giorno di lavoro da comparsa", "Una scansione del corpo", "Un clone digitale, per sempre"] },
+          p: "È l'accusa del sindacato; gli studios smentiscono. Lo sciopero si chiude con una regola: per ogni clone digitale servono consenso e compenso.", src: "Engadget · PetaPixel", log: ["2023", "lo sciopero contro i cloni digitali"] },
+        { h: "Entro il 2028 è a rischio <b>un quarto</b> dei guadagni di chi fa musica.",
+          vis: { t: "donut", pct: 24, label: "24%" },
+          p: "Il motivo: AI addestrate sulla musica esistente, senza pagare chi l'ha scritta. Intanto i ricavi dei servizi AI salgono a 9 miliardi di euro.", src: "CISAC, 2024", log: ["24%", "guadagni dei musicisti a rischio nel 2028"] }],
+      pops: [
+        { t: "Heart on My Sleeve", m: "Canzone fatta con l'AI, 2023", s: "Su TikTok esplode una canzone nuova di Drake e The Weeknd. Nessuno dei due l'ha mai cantata. Viene tolta, ma milioni di persone l'hanno già ascoltata." },
+        { t: "Xania Monet", m: "Artista generata con l'AI, 2025", s: "Una cantante R&B che non esiste: voce, musica e volto generati con l'AI. Entra nelle classifiche di Billboard e firma un contratto da milioni di dollari." },
+        { t: "Il grande grammatizzatore automatico", m: "Racconto di Roald Dahl, 1953", s: "Un ingegnere costruisce una macchina che scrive romanzi. Poi paga gli scrittori perché smettano di scrivere, e la macchina pubblica con i loro nomi." }] },
     q: "Se l'arte la fa una macchina, di chi è? Chi va pagato?",
     opzione_facile: {
       label: "Un abbonamento, e film, serie e musica infinite, fatti su misura per te.",
@@ -121,6 +211,23 @@ export const CHAPTERS = [
       { bacheca: { to: 92, label: "di posti di lavoro spariranno entro il 2030. Ne nasceranno altri, diversi (WEF)",
         legenda: "ogni annuncio strappato: un milione di posti" } },
       "Nel 2031 il primo gradino non esiste più. Il lavoro da stagista, quello in cui sbagliavi e intanto imparavi, lo fa un programma che non sbaglia e non deve imparare niente. Il problema: senza il primo gradino non si arriva al secondo, né al terzo. Le aziende cercano gente con esperienza. L'esperienza, però, non te la fa più fare nessuno. Così le carriere si spezzano prima ancora di cominciare."],
+    audio: "/audio/c5.mp3",
+    registro: {
+      cap: "Il primo lavoro, quello in cui si sbaglia e si impara, ora lo fa una macchina.",
+      items: [
+        { h: "Nei lavori più esposti all'AI, i più giovani perdono terreno. Gli esperti no.",
+          vis: { t: "vs", cols: [["22-25enni, rispetto agli altri", "−13%", "down"], ["Giovani sviluppatori, dal picco del 2022", "≈ −20%", "down"], ["Colleghi più esperti, stessi lavori", "stabili o in crescita", "txt"]] },
+          p: "Lo studio usa le buste paga di milioni di americani. L'AI non toglie il lavoro a tutti: lo toglie a chi comincia.", src: "Stanford SIEPR, 2025 · AfroTech", log: ["−13%", "lavoro per i 22-25enni nei mestieri esposti all'AI"] },
+        { h: "Otto mesi dopo ChatGPT, i lavoretti online sono i primi a sparire.",
+          vis: { t: "bars", rows: [{ l: "Annunci di scrittura", v: "−30%", w: "100%", neg: 1 }, { l: "Scrittura e programmazione", v: "−21%", w: "70%", neg: 1 }, { l: "Grafica e 3D, dopo i generatori di immagini", v: "−17%", w: "57%", neg: 1 }] },
+          p: "Annunci su una grande piattaforma di freelance: erano i lavoretti dei primi soldi e del primo curriculum.", src: "Management Science, 2025", log: ["−21%", "lavoretti online di scrittura e programmazione"] },
+        { h: "Entro il 2030 nascono <b>170 milioni</b> di posti di lavoro e ne spariscono <b>92 milioni</b>.",
+          vis: { t: "lists", lists: [["Crescono", ["braccianti agricoli", "autisti delle consegne", "commessi", "insegnanti e infermieri", "specialisti di AI e big data", "esperti di cybersicurezza"]], ["Spariscono", ["cassieri", "impiegati di banca e delle poste", "segretari", "addetti all'inserimento dati", "contabili", "grafici"]]] },
+          p: "Si svuota il lavoro d'ufficio, quello da cui di solito si comincia.", src: "World Economic Forum, Future of Jobs 2025", log: ["170 mln", "posti nuovi entro il 2030, 92 mln spariscono"] }],
+      pops: [
+        { t: "WALL•E", m: "Film d'animazione, 2008", s: "I robot fanno tutto. Gli umani vivono su un'astronave, galleggiano su poltrone, nutriti e intrattenuti tutto il giorno. Nessuno lavora più, nessuno fa più niente." },
+        { t: "Piano meccanico", m: "Romanzo di Kurt Vonnegut, 1952", s: "Le macchine fanno tutto il lavoro, pochi ingegneri le gestiscono. Gli altri ricevono casa, cibo e televisione. Alla fine si ribellano: non per i soldi, ma per il senso." },
+        { t: "Detroit: Become Human", m: "Videogioco, 2018", s: "Nel 2038 gli androidi fanno quasi tutti i lavori. La disoccupazione è altissima, e per strada si protesta contro le macchine." }] },
     q: "Se il primo lavoro sparisce, da dove si comincia?",
     opzione_facile: {
       label: "Un reddito garantito per tutti. Lavorare diventa facoltativo.",
@@ -141,6 +248,22 @@ export const CHAPTERS = [
       { badge: { to: 40, label: "delle grandi aziende misurerà con l'AI l'umore di chi lavora, entro il 2028 (Gartner)",
         legenda: "ogni badge: una grande azienda su cento · in quelle col mirino, l'AI legge l'umore" } },
       "Niente censori, niente divieti. Ci pensiamo da soli, prima, e gratis. Marta cancella quarantadue post, e l'affitto glielo danno. Il giorno dopo, scrivendo a un'amica, si accorge che sceglie le parole come se qualcuno la stesse leggendo."],
+    audio: "/audio/c6.mp3",
+    registro: {
+      cap: "Un punteggio decide casa e lavoro. E noi impariamo a censurarci da soli.",
+      items: [
+        { h: "Italia, 2022: il Garante privacy indaga sulla «cittadinanza a punti».",
+          vis: { t: "map", pts: [["Fidenza", 44.87, 10.06, "hi", "l"], ["Bologna", 44.49, 11.34, "hi", "r"], ["Lucca, voi siete qui", 43.84, 10.5, "you", "l", 26]] },
+          p: "A Bologna, crediti ai cittadini virtuosi. A Fidenza, un punteggio agli inquilini delle case popolari. Il Garante chiede ai Comuni quali dati usano.", src: "Garante privacy · Cybersecurity360", log: ["2022", "il Garante e la cittadinanza a punti"] },
+        { h: "Dal febbraio 2025, in Europa, il social scoring è <b>vietato</b>.",
+          p: "L'AI Act vieta di dare punteggi alle persone per il loro comportamento, se poi le penalizzano altrove. Multe fino a 35 milioni di euro o al 7% del fatturato mondiale.", src: "AI Act, articolo 5", log: ["vietato", "il social scoring in Europa"] },
+        { h: "Entro il 2028, <b>4 grandi aziende su 10</b> misureranno con l'AI l'umore di chi ci lavora.",
+          vis: { t: "units", n: 10, on: 4, icon: "bldg" },
+          p: "Il punto non è più cosa fai al lavoro, ma come ti senti mentre lo fai.", src: "Gartner", log: ["4 su 10", "aziende che misurano l'umore dei dipendenti"] }],
+      pops: [
+        { t: "Caduta libera", m: "Black Mirror, 2016", s: "Ognuno dà un voto da 1 a 5 a ogni persona che incontra. Lacie deve arrivare a 4,5 per avere lo sconto su una casa. Basta una giornata storta, e il punteggio crolla." },
+        { t: "Psycho-Pass", m: "Anime, 2012", s: "Un sistema misura di continuo lo stato mentale di ogni cittadino. Se il tuo valore sale troppo sei un pericolo, anche senza aver fatto niente. Così tutti imparano a controllarsi." },
+        { t: "Il Panopticon", m: "Jeremy Bentham, 1791 · Michel Foucault, 1975", s: "Un carcere circolare con una torre al centro: i detenuti non sanno mai se qualcuno li guarda, quindi si comportano bene sempre. Il controllo perfetto è quello che fai da solo." }] },
     q: "Un numero decide cosa puoi avere. Da domani, come ti comporti?",
     opzione_facile: {
       label: "Mi adeguo: due post in meno, che sarà mai.",
@@ -160,6 +283,22 @@ export const CHAPTERS = [
       { sagome: { to: 44, label: "di insegnanti in più servono nel mondo entro il 2030 (UNESCO)",
         legenda: "ogni sagoma: un milione di insegnanti che mancano · al loro posto, uno schermo" } },
       "Un edificio pieno di ragazzi, ogni mattina, comincia a sembrare una spesa inutile. I voti salgono, i costi crollano, i genitori sono contenti. Ma c'è una cosa che nei voti non si vede, e che le statistiche non contano. La litigata con il compagno di banco. L'amicizia nata per caso durante un'interrogazione andata male. Il prof che ti ha fatto cambiare idea su chi volevi diventare."],
+    audio: "/audio/c7.mp3",
+    registro: {
+      cap: "Un tutor perfetto, a casa, per ognuno. Si impara meglio, ma si impara da soli.",
+      items: [
+        { h: "Alpha School, Stati Uniti: due ore al giorno con un tutor AI. Niente insegnanti.",
+          vis: { t: "day", seg: [["2 ore di lezione con il tutor AI", 2, 1], ["Il resto della giornata: solo «guide», non insegnanti", 5, 0]] },
+          p: "Il resto del giorno: progetti e laboratori con adulti chiamati «guide». Rette fino a 75.000 dollari l'anno, campus in 16 stati.", src: "Commissione europea · Newsweek", log: ["2 ore", "al giorno con un tutor AI"] },
+        { h: "Dal 2024 il ministero sperimenta l'AI in classe in 15 scuole. Una è <b>qui</b>.",
+          vis: { t: "map", pts: [["Lucca, ISI Pertini", 43.84, 10.5, "you", "r"]] },
+          p: "L'ISI Pertini, a pochi chilometri da qui. L'AI personalizza esercizi e spiegazioni; il docente, dice la preside, resta il regista.", src: "Orizzonte Scuola", log: ["15", "scuole con l'AI in classe, una a Lucca"] },
+        { h: "Da qui al 2030 nel mondo mancano <b>44 milioni</b> di insegnanti.",
+          p: "Quasi 15 milioni solo nell'Africa subsahariana.", src: "UNESCO", log: ["44 mln", "insegnanti che mancano nel mondo"] }],
+      pops: [
+        { t: "La DAD", m: "Il 2020, la vostra", s: "Lezioni in camera, telecamere spente, il compagno di banco ridotto a un riquadro nero. L'avete vissuta a undici anni. La rifareste per sempre?" },
+        { t: "Chissà come si divertivano!", m: "Racconto di Isaac Asimov, 1951", s: "Nel 2157 due bambini studiano da soli in casa con un maestro-robot. Trovano un vecchio libro e sognano i tempi in cui i ragazzi andavano a scuola tutti insieme." },
+        { t: "Doraemon", m: "Manga e anime, dal 1969", s: "Un gatto robot arriva dal futuro per aiutare Nobita, pigro e pessimo a scuola. Ha un gadget per ogni problema, ma quasi sempre la scorciatoia peggiora le cose." }] },
     q: "La scuola come luogo dove andare: la teniamo o la chiudiamo?",
     opzione_facile: {
       label: "Un tutor AI a testa: impari da casa, ai tuoi tempi, e meglio.",
@@ -178,6 +317,22 @@ export const CHAPTERS = [
       { folla: { to: 35, label: "o più: la multa UE per chi prevede i reati dal profilo di una persona (AI Act)",
         legenda: "esempio · la macchina segnala in anticipo e quasi sempre indovina: il problema è quel «quasi»" } },
       "Oggi un'AI ti ferma prima che tu faccia qualcosa. Non si stanca, non ha simpatie, e di solito indovina. I furti calano, le strade sono più tranquille, quasi tutti dicono che funziona. Il problema sta in quel «quasi», e in quel «di solito». Chi finisce dalla parte sbagliata della probabilità non ha un reato da cui difendersi. Ha solo un numero, e con un numero non si discute."],
+    audio: "/audio/c8.mp3",
+    registro: {
+      cap: "Il sistema non giudica quello che hai fatto, ma quello che potresti fare.",
+      items: [
+        { h: "Milano, dal 2009: un software della questura prevede dove e quando colpiranno i rapinatori seriali.",
+          vis: { t: "bars", rows: [{ l: "Rapine, prima di KeyCrime", v: "100", w: "100%" }, { l: "Dopo otto anni di sperimentazione", v: "43", w: "43%", hi: 1 }] },
+          p: "Le rapine calano del 57%. KeyCrime non indovina chi colpirà: studia i colpi già avvenuti di un rapinatore seriale.", src: "Quotidiano Nazionale", log: ["−57%", "rapine a Milano con KeyCrime"] },
+        { h: "XLAW prevede dove ci sarà il prossimo furto. Lo usano già sei città italiane.",
+          vis: { t: "map", pts: [["Venezia", 45.44, 12.33, "hi", "r"], ["Parma", 44.8, 10.33, "hi", "l", -6], ["Modena", 44.65, 10.93, "hi", "r", 0], ["Prato", 43.88, 11.1, "hi", "r", 14], ["Lucca, voi", 43.84, 10.5, "you", "l", 24], ["Napoli", 40.85, 14.27, "hi", "l"], ["Salerno", 40.68, 14.77, "hi", "r", 12]] },
+          p: "Segnala le zone a rischio nelle ore successive. Prato è a meno di un'ora da qui; il Viminale lavora a un sistema nazionale.", src: "SISSA", log: ["6", "città con la polizia predittiva XLAW"] },
+        { h: "Paesi Bassi: l'algoritmo che accusava i genitori.",
+          vis: { t: "timeline", ev: [["2013", "Il fisco usa un algoritmo per scovare le frodi sugli assegni per i figli."], ["Gli anni dopo", "Decine di migliaia di genitori accusati di truffa, anche per la nazionalità. Nessuno spiega perché."], ["2021", "Il governo si dimette."]] },
+          p: "Molte famiglie hanno dovuto restituire decine di migliaia di euro; alcune hanno perso la casa.", src: "Amnesty International", log: ["2021", "il governo olandese si dimette"] }],
+      pops: [
+        { t: "Minority Report", m: "Film, 2002", s: "Washington, 2054. La sezione Precrimine arresta le persone prima che uccidano. Funziona perfettamente, finché il sistema non indica come futuro assassino il capo della sezione." },
+        { t: "Westworld", m: "Serie TV, stagione 3, 2020", s: "Un supercomputer, Rehoboam, traccia in anticipo la vita di ognuno. Chi non si lascia prevedere è un «outlier»: lo isolano, gli riprogrammano il cervello o lo mandano in guerra." }] },
     q: "Punire prima del reato: lo accettiamo?",
     opzione_facile: {
       label: "Sì: se previene i reati, meglio fermarli prima che dopo.",
@@ -198,6 +353,25 @@ export const CHAPTERS = [
       { via: { to: 10, label: "di occhiali smart all'anno: la produzione prevista entro fine 2026 (EssilorLuxottica)",
         legenda: "ogni paio: un milione di occhiali smart all'anno · i filtri tolgono dalla via quello che non vuoi vedere" } },
       "Due persone nella stessa via, ormai, non camminano più nella stessa via. Marta passa accanto a un ragazzo seduto per terra e non lo vede. Lui, invece, vede benissimo lei."],
+    audio: "/audio/c9.mp3",
+    registro: {
+      cap: "Occhiali che tolgono dalla vista ciò che non ci piace. Anche le persone.",
+      items: [
+        { h: "Gli occhiali smart sono già un prodotto di massa. E li produce un'azienda italo-francese.",
+          vis: { t: "bars", rows: [{ l: "Ray-Ban Meta venduti finora", v: "oltre 2 milioni", w: "20%" }, { l: "Produzione EssilorLuxottica entro fine 2026", v: "10 milioni l'anno", w: "100%", hi: 1 }] },
+          p: "Fotocamera e assistente AI nella montatura: chi ti sta davanti può non accorgersi di essere ripreso.", src: "heise · UploadVR", log: ["10 mln", "occhiali smart prodotti ogni anno"] },
+        { h: "Harvard, 2024: due studenti, un paio di occhiali, uno sconosciuto in metro.",
+          vis: { t: "flow", steps: ["Uno sguardo", "Riconoscimento facciale", "<b>Nome, indirizzo, parenti</b>in pochi secondi"] },
+          p: "Hanno usato solo strumenti già disponibili online.", src: "Xataka, 2024", log: ["I-XRAY", "uno sguardo per sapere chi sei"] },
+        { h: "I nuovi occhiali VR di Meta pesano <b>100 grammi</b>: quanto un mazzo di carte.",
+          p: "Pensati per essere indossati per ore, con l'assistente AI dentro. In vendita dalla primavera 2027.", src: "Meta, 2026", log: ["100 g", "occhiali VR da indossare per ore"] },
+        { h: "Apple Vision Pro: la stanza sparisce. Le persone riappaiono, a meno che tu non decida altrimenti.",
+          vis: { t: "toggle", label: "People Awareness" },
+          p: "La protezione che fa riapparire chi ti si avvicina è un interruttore. E si può spegnere.", src: "Apple, guida utente", log: ["OFF", "l'interruttore che fa sparire le persone"] }],
+      pops: [
+        { t: "Bianco Natale", m: "Black Mirror, 2014", s: "Con un impianto negli occhi puoi «bloccare» una persona nella vita reale: diventa una sagoma grigia e sfocata, e non la senti più." },
+        { t: "Ready Player One", m: "Film, 2018", s: "Il mondo reale cade a pezzi, così tutti indossano un visore ed entrano in OASIS, dove ognuno sceglie com'è il mondo e com'è lui." },
+        { t: "Bold Glamour", m: "Filtro TikTok, 2023", s: "Un filtro di bellezza così perfetto che non si capisce più dove finisce la faccia vera. In pochi giorni lo usano milioni di persone." }] },
     q: "Puoi far sparire quello che non vuoi vedere. Lo fai sparire?",
     opzione_facile: {
       label: "Sì: tolgo lo sporco, la pubblicità e chi mi fa stare male.",
@@ -216,6 +390,25 @@ export const CHAPTERS = [
       { cinque: { to: 40, label: "di oggetti connessi nel mondo entro il 2030: orologi, auto, case (IoT Analytics)",
         legenda: "ogni oggetto: un miliardo · per ogni persona sulla Terra, circa cinque oggetti connessi" } },
       "Chi ha i tuoi dati addestra le macchine. Chi addestra le macchine, decide. Decide che lavoro ti viene proposto, quanto paghi l'assicurazione, quali notizie vedi per prime, chi ti compare davanti in un'app di incontri. Niente di segreto: hai firmato tutto, con un clic, alle due di notte. Il contratto era di quarantasei pagine. Le hanno lette in pochissimi, e non sarebbe cambiato niente."],
+    audio: "/audio/c10.mp3",
+    registro: {
+      cap: "Diamo tutto di noi in cambio di comodità. Chi ha i nostri dati, decide per noi.",
+      items: [
+        { h: "Marzo 2025: 23andMe fallisce. Il DNA di <b>15 milioni</b> di clienti finisce all'asta.",
+          p: "Era l'azienda dei test genetici fatti a casa: bastava sputare in una provetta. Una password si può cambiare, il DNA no.", src: "SCMP / Bloomberg", log: ["15 mln", "profili genetici all'asta"] },
+        { h: "«Paghi o acconsenti»: o cedi i tuoi dati, o paghi.",
+          vis: { t: "choice", title: "Per continuare a usare Facebook e Instagram", a: "Acconsenti alla pubblicità personalizzata", b: "Abbonati senza pubblicità", bs: "a pagamento" },
+          p: "Per questo modello, nel 2025, l'Unione europea multa Meta per 200 milioni di euro: per l'UE non è una vera scelta.", src: "Wolters Kluwer, 2025", log: ["200 mln €", "multa a Meta per «paghi o acconsenti»"] },
+        { h: "Mezz'ora dopo, <b>93 video su 100</b> parlavano di tristezza.",
+          vis: { t: "feed", sad: 93 },
+          p: "Un account-robot del Wall Street Journal si era solo fermato due volte su un video triste. Non serve postare niente: basta guardare.", src: "Wall Street Journal, 2021", log: ["93%", "feed triste dopo due pause su un video"] },
+        { h: "Entro il 2030, <b>40 miliardi</b> di oggetti connessi: quasi cinque per ogni persona sulla Terra.",
+          vis: { t: "units", n: 5, on: 5, icon: "dev" },
+          p: "Telefoni e computer esclusi: orologi, auto, case, elettrodomestici. Tutti raccolgono dati.", src: "IoT Analytics", log: ["40 mld", "oggetti connessi nel 2030"] }],
+      pops: [
+        { t: "The Social Dilemma", m: "Documentario Netflix, 2020", s: "Gli ingegneri che hanno costruito i social spiegano come funzionano da dentro: se il prodotto è gratis, il prodotto sei tu." },
+        { t: "Watch Dogs", m: "Videogioco, 2014-2020", s: "Un'intera città è collegata a un unico sistema: punti il telefono su un passante e leggi chi è, quanto guadagna, cosa nasconde." },
+        { t: "Noi", m: "Romanzo di Evgenij Zamjatin, 1924", s: "Case di vetro: nessuno ha niente da nascondere. Poi lo Stato asporta a tutti l'immaginazione, per renderli felici per sempre. È il libro che ha ispirato 1984." }] },
     q: "I nostri dati: li scambiamo con tutto, o ce li teniamo?",
     opzione_facile: {
       label: "Li do: è tutto gratis, e non ho niente da nascondere.",
@@ -236,6 +429,26 @@ export const CHAPTERS = [
       { fasce: { to: 59, label: "dei lavoratori dovrà imparare cose nuove entro il 2030 (WEF)",
         legenda: "ogni testa: un lavoratore su cento · 59 dovranno imparare cose nuove, e c'è chi lo farà dormendo" } },
       "Quella cosa la sai. Le seicento ore per impararla, però, non le hai mai passate. Conta? Marta se lo chiede correggendo i compiti: risposte perfette, tutte uguali. Non sbaglia più nessuno. Quasi nessuno sa dire perché una risposta è giusta. Lei ricorda ancora la notte in cui, a diciannove anni, aveva finalmente capito un teorema. Una delle notti più belle della sua vita."],
+    audio: "/audio/c11.mp3",
+    registro: {
+      cap: "Sapere tutto senza fatica. Ma sapere una cosa non vuol dire averla capita.",
+      items: [
+        { h: "Un profumo di rosa, sentito di nuovo nel sonno profondo, rafforza i ricordi.",
+          vis: { t: "vs", cols: [["Coppie ritrovate a memory, senza profumo", "85%", ""], ["Con il profumo di rosa nel sonno", "97%", "up"]] },
+          p: "Volontari giocano a memory con un profumo di rosa; di notte lo stesso profumo torna nella stanza. Nel sonno REM non funziona.", src: "Rasch et al., Science, 2007", log: ["97%", "ricordi con la rosa nel sonno"] },
+        { h: "Friburgo, 2020: lo stesso trucco, in camera, con 54 studenti di prima media.",
+          vis: { t: "bars", rows: [{ l: "Vocaboli di inglese imparati, senza profumo", v: "", w: "77%" }, { l: "Con la rosa sulla scrivania e sul comodino", v: "+30%", w: "100%", hi: 1 }] },
+          p: "Ma il profumo non insegna niente di nuovo: rafforza solo quello che hai già studiato.", src: "Università di Friburgo, 2020", log: ["+30%", "vocaboli imparati con la rosa"] },
+        { h: "Regno Unito, 2025: <b>92 universitari su 100</b> usano l'AI.",
+          vis: { t: "waffle", on: 92 },
+          p: "L'88% la usa per esami e compiti. Quasi uno su cinque ha incollato testo generato nel proprio lavoro.", src: "HEPI, 2025", log: ["92%", "universitari che usano l'AI"] },
+        { h: "Neuralink: dal primo impianto ai primi pazienti.",
+          vis: { t: "timeline", ev: [["Gennaio 2024", "Noland Arbaugh, paralizzato dalle spalle in giù, riceve il primo impianto."], ["Marzo 2024", "Muove un cursore e gioca a scacchi online con il pensiero."], ["Agosto 2025", "I pazienti sono nove, in quattro Paesi."]] },
+          p: "Oggi l'impianto legge il cervello. Il capitolo immagina il giorno in cui ci scrive.", src: "Fortune · MIT Technology Review", log: ["9", "pazienti con l'impianto Neuralink"] }],
+      pops: [
+        { t: "Limitless", m: "Film, 2011", s: "Una pillola, l'NZT, fa usare a Eddie tutto il cervello: impara una lingua in un giorno e scala la finanza. Poi arrivano gli effetti collaterali, e la paura di restarne senza." },
+        { t: "Il mondo nuovo", m: "Romanzo di Aldous Huxley, 1932", s: "I bambini imparano dormendo, con frasi ripetute. Ma un bambino che ripete a memoria un'intera lezione sentita alla radio non ne ha capito una parola." },
+        { t: "Matrix", m: "Film, 1999", s: "Neo viene collegato a una sedia e in pochi secondi sa il kung fu. Subito dopo Morpheus lo sfida: saperlo non basta, deve imparare a usarlo." }] },
     q: "Puoi caricarti in testa una materia senza studiarla. Lo fai?",
     opzione_facile: {
       label: "Sì: domani passo l'esame, e mi resta il tempo per vivere.",
@@ -255,6 +468,23 @@ export const CHAPTERS = [
       { ospedale: { to: 15, label: "delle decisioni di lavoro quotidiane la prenderà un'AI da sola, entro il 2028 (Gartner)",
         legenda: "esempio · sulla carta tornava tutto: le strade per arrivare altrove non c'erano" } },
       "L'errore c'è stato. L'oracolo ha chiuso un ospedale che serviva trecentomila persone: secondo i suoi calcoli, quei pazienti potevano curarsi altrove. Sulla carta tornava tutto. Nella realtà, le strade per arrivare altrove non c'erano. Per settimane i numeri hanno continuato a dire che andava tutto bene. Le persone, invece, no. Adesso la domanda è una sola: se n'è accorto qualcuno? Se sì, chi ha il coraggio di dire che la macchina ha sbagliato?"],
+    audio: "/audio/c12.mp3",
+    registro: {
+      cap: "Abbiamo affidato le decisioni a una macchina. Ha sbagliato. Chi se n'è accorto?",
+      items: [
+        { h: "Inghilterra, 2020: un algoritmo abbassa <b>39 voti di maturità su 100</b>.",
+          vis: { t: "waffle", on: 39, coral: 1 },
+          p: "Circa 280.000 voti, penalizzando chi studiava in scuole con risultati bassi. I ragazzi scendono in piazza: in quattro giorni il governo torna indietro.", src: "ITV News · London Review of Books", log: ["39%", "voti di maturità abbassati dall'algoritmo"] },
+        { h: "Italia, 2016: l'algoritmo che sbagliava provincia.",
+          vis: { t: "timeline", ev: [["2016", "Il ministero affida i trasferimenti a un algoritmo: migliaia di insegnanti finiscono nella provincia sbagliata."], ["Poi", "Ricorsi, fino al Consiglio di Stato."], ["Il principio", "Una decisione automatica deve essere conoscibile, non esclusiva, non discriminatoria."]] },
+          p: "Per vedere il codice dell'algoritmo, i sindacati hanno dovuto rivolgersi ai giudici.", src: "Orizzonte Scuola", log: ["2016", "l'algoritmo dei trasferimenti"] },
+        { h: "Entro il 2028, <b>3 decisioni di lavoro su 20</b> le prenderà un'AI da sola.",
+          vis: { t: "units", n: 20, on: 3, icon: "doc" },
+          p: "Nel 2024 erano praticamente zero: dall'AI che consiglia all'AI che decide.", src: "Gartner", log: ["15%", "decisioni prese da un'AI da sola nel 2028"] }],
+      pops: [
+        { t: "Chernobyl", m: "Serie HBO, 2019", s: "Dopo l'esplosione il dosimetro segna 3,6 roentgen: «non buono, non terribile». Ma 3,6 era il massimo che poteva misurare. I numeri dicevano che andava tutto bene." },
+        { t: "Creso e l'oracolo", m: "Erodoto, Storie", s: "Il re Creso chiede all'oracolo di Delfi se attaccare i Persiani: «distruggerai un grande impero». Attacca. L'impero che crolla è il suo." },
+        { t: "2001: Odissea nello spazio", m: "Film, 1968", s: "HAL 9000, il computer di bordo che non ha mai sbagliato, segnala un guasto che non esiste. Quando gli astronauti decidono di spegnerlo, lui non glielo permette." }] },
     q: "L'oracolo ha sbagliato. Ci fidiamo ancora?",
     opzione_facile: {
       label: "È stato un incidente: ci fidiamo ancora, sbaglia meno di noi.",
@@ -269,6 +499,20 @@ export const CHAPTERS = [
   { id: "agenti", n: 13, anno: "2039", data: "2039-08-30", ruolo: "climax",
     votabile: false, mostra_live: false, durata_voto_sec: 0,
     titolo: "Permesso?",
+    audio: "/audio/c13.mp3",
+    registro: {
+      cap: "Gli agenti AI chiedono il permesso mille volte. Poi smettono di chiederlo.",
+      items: [
+        { h: "Agenti che pagano al posto tuo. All'inizio chiedono conferma. Poi, dice Visa, sempre meno.",
+          vis: { t: "confirm", rows: [["Spesa della settimana", "ask"], ["Biglietto del treno", "ask"], ["Ricarica del telefono", "auto"], ["Regalo di compleanno", "auto"], ["Abbonamento in scadenza", "auto"]] },
+          p: "Dal 2025 Visa e Mastercard permettono agli agenti AI di comprare per conto delle persone. Gli acquisti qui sono un esempio.", src: "TechCrunch · Website Planet", log: ["pagano", "agenti che comprano al posto tuo"] },
+        { h: "Agenti che guidano: le auto Waymo, senza nessuno al volante.",
+          vis: { t: "bars", rows: [{ l: "Corse a pagamento a settimana, meno di un anno fa", v: "circa 250.000", w: "25%" }, { l: "Oggi, negli Stati Uniti", v: "500.000", w: "50%", hi: 1 }, { l: "Obiettivo per fine 2026", v: "1 milione", w: "100%", dash: 1 }] },
+          p: "Waymo è di Alphabet, la società di Google. In Europa, il primo robotaxi arriva a Zagabria.", src: "InsideEVs · Noqta, 2026", log: ["guidano", "500.000 corse a settimana senza autista"] },
+        { h: "Agenti che lavorano: dentro i software aziendali.",
+          vis: { t: "vs", cols: [["Software aziendali con agenti AI, 2024", "< 1%", ""], ["Nel 2028", "1 su 3", "up"]] },
+          p: "Rispondono ai clienti, scrivono codice, gestiscono la posta: lavori interi, non singole risposte.", src: "Gartner", log: ["lavorano", "1 software su 3 con agenti AI nel 2028"] }],
+      pops: [] },
     beats: ["30 agosto 2039. Questa volta non c'è niente da votare. Niente domande sullo schermo, niente timer. Solo il libro che si ferma, e comincia a fare i conti.",
       "Gli agenti autonomi sono programmi che agiscono da soli: pagano, prenotano, rispondono, decidono. Non sono arrivati all'improvviso. Sono il punto d'arrivo di tutto questo libro. Ogni capitolo che avete ascoltato era una piccola richiesta di permesso: lasci che una macchina ti tenga al fresco, ti faccia compagnia, ti racconti le storie, ti insegni, ti giudichi, decida per tutti? Ogni volta che la sala ha detto sì, le macchine hanno imparato a fare un pezzo in più da sole.",
       { sig: "Nel 2039 la domanda non è più cosa sappiano fare le macchine da sole. È quante volte, in undici anni, ci siamo tenuti il diritto di dire no." },
@@ -278,6 +522,14 @@ export const CHAPTERS = [
   { id: "specchio", n: 14, anno: "2040", data: "2040-10-21", ruolo: "chiusura",
     votabile: false, mostra_live: false, durata_voto_sec: 0,
     titolo: "Lo specchio",
+    audio: "/audio/c14.mp3",
+    registro: {
+      cap: "Il libro si chiude. L'ultima pagina non parla del futuro: parla di voi.",
+      noLog: true,
+      items: [
+        { vis: { t: "big", num: "Guardate il telefono." },
+          p: "C'è una pagina scritta solo per voi." }],
+      pops: [] },
     beats: ["Ottobre 2040. Sono passati quattordici anni esatti da questa mattina. Chi era seduto in questa sala adesso ha più di trent'anni. Qualcuno lavora in una città che oggi non immagina nemmeno. Qualcuno ha figli che vanno alle elementari. Qualcuno fa un mestiere che nel 2026 non esisteva. Qualcuno è rimasto a pochi passi da qui. Qualcuno è andato lontano.",
       "Il libro che abbiamo letto insieme finisce qui. L'ultima pagina non parla del futuro: parla di una sala. Parla di voi, seduti al buio una mattina d'ottobre del 2026, che avete votato dodici volte senza sapere cosa stavate firmando. Dodici scelte fatte in fretta, a volte ridendo, a volte in silenzio, a volte guardando cosa votava chi vi stava accanto. Messe in fila, fanno un mondo intero. Quello che state per vedere, con i pezzi rotti e quelli che hanno tenuto.",
       { sig: "Quando stamattina abbiamo cominciato, questo capitolo non esisteva. L'avete scritto voi. Adesso ve lo leggo." }] }

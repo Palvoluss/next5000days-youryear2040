@@ -528,9 +528,9 @@
     tipi, lib: { rng, shuffle, fmt, f1, milioni, angoli, figura, conta, vivo },
     // markup del beat, o "" se il beat non è una figura registrata
     html(b) { const k = Object.keys(b).find(k => tipi[k]); return k ? tipi[k].html(b[k]) : ""; },
-    // anima le figure dentro root; restituisce le loro timeline
+    // anima la figura root, o le figure dentro root; restituisce le loro timeline
     run(root) {
-      return [...root.querySelectorAll("[data-viz]")].map(fig => {
+      return (root.matches("[data-viz]") ? [root] : [...root.querySelectorAll("[data-viz]")]).map(fig => {
         fig.classList.add("on");
         if (!G) return null;
         const tl = tipi[fig.dataset.viz].run(fig);

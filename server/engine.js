@@ -11,7 +11,7 @@ import {
   CHAPTERS, INTRECCI, ORACOLO_PER_I5, CLIMAX, SOGLIA_CLIMAX, BANDE
 } from "./content.js";
 
-export { CHAPTERS, INTRECCI, START_DATE, REF_2040, FALLBACK } from "./content.js";
+export { CHAPTERS, INTRECCI, START_DATE, REF_2040, FALLBACK, INTRO_PASSI } from "./content.js";
 
 export const VOTABILI = CHAPTERS.filter(c => c.votabile);
 export const BIVI = VOTABILI.length;

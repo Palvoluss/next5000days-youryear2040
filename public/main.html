@@ -6,6 +6,13 @@
 <title>Il Libro Vivo del 2040 — Main Screen</title>
 <link rel="stylesheet" href="style.css">
 <style>
+  /* Il ledwall si legge da fondo sala: tutte le misure in rem crescono insieme
+     da qui. ponytail: un solo moltiplicatore, da tarare sul ledwall vero. */
+  html { font-size: 125%; }
+  /* l'alone ocra in alto a sinistra stava proprio dietro il racconto: qui è più
+     tenue, e il testo ha un'ombra che lo stacca dal fondo */
+  body { background-image: radial-gradient(circle at top left, rgba(236,174,49,0.45) 0%, var(--slate-a) 60%, var(--bg-slate) 100%); }
+  #chBody, #revealArea, .poles { text-shadow: 0 1px 3px rgba(0,0,0,0.55); }
   #fx { position: absolute; top: 0; left: 0; z-index: 0; pointer-events: none; }
   .layout { position: relative; z-index: 3; min-height: 100vh; display: flex; }
 
@@ -34,14 +41,22 @@
 
   /* calendario del caldo: una riga per mese (etichettata), 31 colonne per i giorni. I giorni >40° arrossano */
   .heatgrid { margin: 1.3em 0; }
-  .hg-cal { display: grid; grid-template-columns: max-content repeat(31, 1fr); gap: 3px; align-items: center; max-width: 540px; }
+  .hg-cal { display: grid; grid-template-columns: max-content repeat(31, 1fr); gap: 3px; align-items: center; max-width: 540px; margin: 0 auto; }
+  .heatgrid figcaption { text-align: center; }
   .hg-mon { font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.7rem; color: var(--muted); text-align: right; padding-right: 8px; }
   .hg-cell, .hg-pad { aspect-ratio: 1; border-radius: 2px; }
   .hg-cell { background: rgba(236,174,49,0.16); }
+  .heatgrid:not(.on) .hg-cal { visibility: hidden; }   /* fino a runHeatGrid, come le figure di viz.js */
   .hg-cell.hot.on { background: var(--terra); box-shadow: 0 0 8px var(--terra); }
   .heatgrid figcaption { margin-top: 0.7em; font-family: var(--font-serif); color: var(--muted); font-size: 0.95rem; }
   .heatgrid .hg-count { font-family: var(--font-display); font-weight: 800; color: var(--terra); font-size: 1.7rem; font-variant-numeric: tabular-nums; }
-  main { flex: 1; padding: var(--sp-xl); max-width: 60vw; }
+  /* Colonna larga e corpo che cresce con lo schermo: la riga resta sugli 80
+     caratteri, ma ogni lettera è più grande. Le figure di viz.js hanno una
+     larghezza massima propria e restano come sono. */
+  main { flex: 1; padding: var(--sp-xl); max-width: 88vw; }
+  #chBody .beat, #chBody .signal { font-size: clamp(1.25rem, 1.9vw, 2.2rem); max-width: 80ch; }
+  #revCosto { font-size: clamp(1.15rem, 1.6vw, 1.8rem); max-width: 80ch; }
+  .scenario .fired { font-size: clamp(1rem, 1.4vw, 1.5rem); }
   #game { justify-content: center; }   /* aside nascosto → colonna centrata */
   aside { width: 34vw; padding: var(--sp-xl) var(--sp-lg); border-left: 1px solid var(--wire); }
 
@@ -52,31 +67,30 @@
 
   /* voting poles */
   .poles { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--sp-lg); margin-top: var(--sp-lg); }
-  .pole { border: 1px solid var(--wire); border-radius: 16px; padding: var(--sp-md); min-height: 34vh; display: flex; flex-direction: column; justify-content: space-between; transition: 0.3s; }
-  .pole.facile { border-color: var(--terra); }
-  .pole.difficile { border-color: var(--ochre); }
-  .pole.win { box-shadow: 0 0 0 2px currentColor inset; }
-  .pole.facile.win { color: var(--terra); }
-  .pole.difficile.win { color: var(--ochre); }
-  .pole .opt { font-family: var(--font-serif); font-size: clamp(1rem,1.6vw,1.4rem); color: var(--white); }
+  /* Il colore non dice quale strada è la comoda: a ogni capitolo i due colori
+     si scambiano (main.js mette .scambia sui capitoli pari). */
+  #game { --c-facile: var(--terra); --c-difficile: var(--ochre); }
+  #game.scambia { --c-facile: var(--ochre); --c-difficile: var(--terra); }
+  .pole { border: 1px solid var(--c); border-radius: 16px; padding: var(--sp-md); min-height: 34vh; display: flex; flex-direction: column; justify-content: space-between; transition: 0.3s; }
+  .pole.facile { --c: var(--c-facile); }
+  .pole.difficile { --c: var(--c-difficile); }
+  .pole.win { box-shadow: 0 0 0 2px var(--c) inset; color: var(--c); }
+  .pole .opt { font-family: var(--font-serif); font-size: clamp(1.2rem,2vw,2rem); color: var(--white); }
   /* "Cosa guadagni / Cosa paghi" invece di una tabella pro-contro: mette la sala
      davanti al dilemma senza far sembrare ovvia la risposta giusta */
-  .pole .gain, .pole .cost { font-size: 0.95rem; color: var(--muted); margin-top: 0.9em; }
+  .pole .gain, .pole .cost { font-size: clamp(1.15rem,1.5vw,1.7rem); color: rgba(255,255,255,0.85); margin-top: 0.9em; }
   .pole .gain b, .pole .cost b { display: block; font-family: var(--font-display); font-weight: 700;
-    font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.25em; }
-  .pole.facile .gain b, .pole.facile .cost b { color: var(--terra); }
-  .pole.difficile .gain b, .pole.difficile .cost b { color: var(--ochre); }
+    font-size: 0.8rem; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.25em; color: var(--c); }
   .pole .n { font-family: var(--font-display); font-weight: 800; font-size: clamp(2.5rem,7vw,5rem); font-variant-numeric: tabular-nums; min-width: 0; }
-  /* timer del voto: una barra che si svuota, senza cifre — un numero che scende
-     mette fretta, una barra dà il tempo che resta senza contarlo */
-  .votebar { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.12); overflow: hidden; margin-top: var(--sp-sm); }
+  /* timer del voto: la barra che si svuota e i secondi che restano */
+  .voterow { display: flex; align-items: center; gap: var(--sp-sm); margin-top: var(--sp-sm); }
+  .votebar { flex: 1; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.12); overflow: hidden; }
   .votebar > i { display: block; height: 100%; width: 100%; background: var(--ochre); transform-origin: left center; }
+  #voteSec { font-family: var(--font-display); font-weight: 800; font-size: 2.2rem; color: var(--ochre);
+    font-variant-numeric: tabular-nums; min-width: 2.4ch; text-align: right; }
   #voteCount { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.12em;
     text-transform: uppercase; font-size: 0.95rem; color: var(--muted); margin-top: var(--sp-sm); }
   #voteCount b { font-size: 2.2rem; color: var(--ochre); letter-spacing: 0; vertical-align: -0.15em; }
-  /* dice che il silenzio è voluto, non un guasto */
-  #voteCount .pill { display: inline-block; margin-left: 0.8em; padding: 0.35em 0.9em; font-size: 0.7rem;
-    border: 1px solid var(--wire); border-radius: 999px; letter-spacing: 0.1em; }
 
   /* MEZZA FIGURA (§4.6) — identica per tutti e cinque gli intrecci. Nessun colore
      di segno, nessuna lettera leggibile: la sala vede CHE sta costruendo qualcosa,
@@ -92,11 +106,20 @@
   /* rivelazione: la forbice finale si vede sempre qui, anche dove il live era spento */
   .revtally { display: flex; gap: var(--sp-md); font-family: var(--font-display); font-weight: 800;
     font-size: clamp(1.6rem,4vw,3rem); font-variant-numeric: tabular-nums; margin: var(--sp-sm) 0; }
-  .revtally span:first-child { color: var(--terra); }
-  .revtally span:last-child { color: var(--ochre); }
-  /* il nome dell'esito è la cosa che il narratore annuncia: va grande */
-  #revEsito .fired { font-size: 1.05rem; padding: var(--sp-md); }
-  #revEsito .fired .nome { font-size: clamp(1.3rem,3vw,2.2rem); letter-spacing: 0.02em; margin-bottom: 0.5em; }
+  #revF { color: var(--c-facile); }
+  #revD { color: var(--c-difficile); }
+  /* INTRECCIO SALDATO — le due scelte della sala che l'hanno prodotto entrano
+     dai lati, due fili le annodano, e dal nodo si apre l'esito. Il nome
+     dell'esito è la cosa che il narratore annuncia: va grande. */
+  .intreccio .decisioni { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-md); }
+  .intreccio .dec { border: 1px solid rgba(255,255,255,0.35); border-radius: 12px; padding: var(--sp-sm) var(--sp-md);
+    background: rgba(255,255,255,0.05); font-size: clamp(1.05rem,1.4vw,1.5rem); }
+  .intreccio .dec .year { display: block; margin-bottom: 0.4em; color: var(--muted); }
+  /* viewBox 100×6 scalato con la larghezza: lo spessore è in unità del viewBox */
+  .intreccio .fili { display: block; width: 100%; height: auto; overflow: visible; }
+  .intreccio .fili path { fill: none; stroke: rgba(255,255,255,0.6); stroke-width: 0.25; stroke-dasharray: 1; stroke-dashoffset: 0; }
+  .intreccio .fired { font-size: clamp(1.4rem,1.8vw,2rem); padding: var(--sp-md) var(--sp-lg); margin: 0; }
+  .intreccio .fired .nome { font-size: clamp(1.6rem,3.6vw,2.8rem); letter-spacing: 0.02em; margin-bottom: 0.5em; }
   /* SCENARIO GLOBALE — i sei esiti raggruppati per cosa hanno fatto al mondo.
      Non è una tabella di finali: il raggruppamento si compone a runtime, e i
      gruppi vuoti non compaiono (se niente ha tenuto, non c'è «ha tenuto»). */
@@ -112,8 +135,8 @@
   .gruppo.rotto h3 { color: var(--terra); }
   .gruppo.tenuto h3 { color: var(--ochre); }
   .gruppo.meta h3 { color: rgba(255,255,255,0.75); }
-  /* il climax chiude: è l'unica cosa che non è un intreccio */
-  .scenario .chiusura { border-top: 1px solid var(--wire); padding-top: var(--sp-md); margin-top: var(--sp-lg);
+  /* il climax è il titolo del mondo: sta in testa, sopra gli esiti che l'hanno costruito */
+  .scenario .chiusura { border-bottom: 1px solid var(--wire); padding-bottom: var(--sp-md); margin: var(--sp-sm) 0 var(--sp-lg);
     font-size: clamp(1rem,1.6vw,1.3rem); }
   .scenario .chiusura .nome { display: block; font-family: var(--font-display); font-weight: 800;
     text-transform: uppercase; letter-spacing: 0.02em; font-size: clamp(1.4rem,3vw,2.4rem); margin-bottom: 0.4em; }
@@ -122,6 +145,265 @@
   .beat { margin: 1em 0; }
   .agg { display: flex; justify-content: space-between; border-bottom: 1px solid var(--wire); padding: 0.4em 0; font-size: 0.9rem; }
   .agg b { color: var(--ochre); }
+
+  /* SLIDE — intro (speaker, manuale) e registro dei capitoli. Un palco
+     1920×1080 scalato a schermo (main.js, fitStages), come le slide d'esempio:
+     le misure qui sotto sono in px del palco. Sfondo trasparente: grana e
+     pallini dell'app restano dietro. */
+  .slide { position: fixed; inset: 0; z-index: 3; overflow: hidden; text-shadow: 0 1px 3px rgba(0,0,0,0.55); }
+  .stage { position: absolute; top: 0; left: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+  .slide h1 { margin: 0; white-space: nowrap; overflow: hidden; font-family: var(--font-display); font-weight: 800;
+    font-size: 92px; line-height: 1.05; text-transform: uppercase; letter-spacing: 0.01em; }
+  .slide .head { position: absolute; top: 54px; left: 84px; right: 84px; }
+  @keyframes sale { from { opacity: 0; transform: translateY(18px); } }
+  @media (prefers-reduced-motion: reduce) { .slide *, .slide *::before { transition: none !important; animation: none !important; } }
+
+  /* speaker */
+  .people { position: absolute; top: 190px; left: 84px; right: 84px; display: flex; gap: 80px; }
+  .person { width: 836px; animation: sale 0.8s cubic-bezier(.2,.7,.1,1) 0.2s both; }
+  .person + .person { animation-delay: 0.45s; }
+  .person img { display: block; width: 340px; height: 340px; }
+  .person h2 { margin: 30px 0 0; font-size: 44px; line-height: 1.05; white-space: nowrap; overflow: hidden; }
+  .person .role { margin: 14px 0 0; font-size: 27px; line-height: 1.35; color: rgba(255,255,255,0.88); }
+  .person .role b { font-family: var(--font-display); font-weight: 700; font-size: 0.82em; color: var(--ochre); }
+  .person .lists { display: flex; gap: 56px; margin-top: 30px; }
+  .person .list { width: 390px; }
+  .person .list h3 { margin: 0 0 10px; font-family: var(--font-display); font-weight: 700; font-size: 17px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .person .list.yes h3 { color: var(--ochre); }
+  .person .list.no h3 { color: var(--terra); }
+  .person ul { margin: 0; padding: 0; list-style: none; }
+  .person li { position: relative; padding: 7px 0 7px 26px; font-size: 26px; line-height: 1.3; border-bottom: 1px solid var(--wire); }
+  .person li::before { content: ""; position: absolute; left: 2px; top: 21px; width: 10px; height: 10px; border-radius: 50%; }
+  .person .yes li::before { background: var(--ochre); }
+  .person .no li::before { background: var(--terra); }
+  .person li.empty { height: 38px; padding: 0; border-bottom: 2px dotted rgba(255,255,255,0.3); }   /* righe da compilare */
+  .person li.empty::before { opacity: 0.35; top: 13px; }
+
+  /* manuale d'istruzioni — le regole una per «Avanti», poi il programma */
+  #sRegole .sec { position: absolute; left: 84px; right: 84px; font-style: italic; font-size: 28px; color: rgba(255,255,255,0.82);
+    padding-bottom: 12px; border-bottom: 1px solid var(--wire); }
+  #sRegole .sec.rules-h { top: 190px; }
+  #sRegole .sec.prog-h, #sRegole .day { opacity: 0; transition: opacity 0.6s; }
+  #sRegole .sec.prog-h { top: 780px; }
+  #sRegole.prog .sec.prog-h, #sRegole.prog .day { opacity: 1; }
+  .rules { position: absolute; top: 262px; left: 84px; right: 84px; display: flex; gap: 25px; }
+  .rule { width: 330px; opacity: 0; transform: translateY(22px); transition: opacity 0.6s, transform 0.7s cubic-bezier(.2,.7,.1,1); }
+  .rule.on { opacity: 1; transform: none; }
+  .rule .n { font-family: var(--font-display); font-weight: 800; font-size: 40px; line-height: 1; color: var(--ochre); }
+  .rule h2 { margin: 14px 0 12px; font-family: var(--font-serif); font-weight: 500; font-size: 33px; line-height: 1.15; text-transform: none; letter-spacing: 0; }
+  .rule p { margin: 0; font-size: 25px; line-height: 1.38; color: rgba(255,255,255,0.9); }
+  .rule em { font-style: normal; font-family: var(--font-display); font-weight: 800; color: var(--terra); letter-spacing: 0.02em; }
+  .rule u { text-decoration: none; border-bottom: 3px solid var(--ochre); padding-bottom: 1px; font-weight: 500; }
+  .rule .red { color: #e5604a; font-weight: 500; }   /* il rosso del casino autorizzato, come le tacche del programma */
+  .rule.ask .n { color: var(--terra); }
+  .rule.ask h2 { color: #f3c3b3; }
+  #sRegole .day { position: absolute; top: 880px; left: 84px; right: 84px; transition-delay: 0.15s; }
+  .day .track-p { display: flex; gap: 10px; }
+  .seg { position: relative; }
+  .seg .bar { position: relative; height: 30px; border-radius: 6px; }
+  .seg.open .bar, .seg.end .bar { border: 2px solid rgba(255,255,255,0.55); }
+  .seg.cap .bar { background: var(--ochre); }
+  .seg.brk .bar { background: var(--terra); }
+  .seg .name { margin-top: 14px; font-family: var(--font-display); font-weight: 700; font-size: 20px; }
+  .seg.brk .name { color: var(--terra); }
+  .seg.cap .name { color: var(--ochre); }
+  .seg .sub { margin-top: 6px; font-size: 20px; line-height: 1.3; color: rgba(255,255,255,0.78); }
+  .seg .phones { position: absolute; left: 0; right: 0; top: -42px; text-align: center; }
+  .seg .phones svg { display: inline-block; margin: 0 6px; fill: none; stroke: currentColor; stroke-width: 2; opacity: 0.85; }
+  .seg .tk { position: absolute; top: -9px; width: 6px; height: 48px; margin-left: -3px; border-radius: 3px; background: #e5604a; box-shadow: 0 0 0 3px rgba(35,62,77,0.55); }
+  .day .legend { margin-top: 26px; font-size: 20px; color: rgba(255,255,255,0.82); }
+  .day .legend i { display: inline-block; vertical-align: middle; width: 6px; height: 26px; margin-right: 12px; border-radius: 3px; background: #e5604a; }
+  .day .legend b { display: inline-block; vertical-align: middle; width: 26px; height: 14px; margin: 0 12px 0 34px; border-radius: 3px; background: var(--terra); }
+
+  /* REGISTRO — testata, un dato alla volta a sinistra, «Cosa sappiamo oggi» a
+     destra, poi le locandine. Parte sotto il titolo dei giorni (#iReadout). */
+  #registro .shead { position: absolute; top: 140px; left: 84px; right: 84px; animation: sale 0.7s cubic-bezier(.2,.7,.1,1) both; }
+  #registro .shead .year { font-size: 24px; letter-spacing: 0.12em; }
+  #registro .shead h1 { margin-top: 10px; }
+  #registro .shead .cap { margin: 16px 0 0; white-space: nowrap; overflow: hidden; font-size: 30px; font-style: italic; line-height: 1.3; color: rgba(255,255,255,0.86); }
+  .f-stage { position: absolute; left: 84px; top: 380px; width: 1210px; height: 660px; }
+  .f-stage.full { width: 1752px; }   /* il capitolo 14: niente colonna a destra */
+  .fitem { position: absolute; inset: 0 0 40px 0; display: flex; flex-direction: column; justify-content: center;
+    opacity: 0; transform: translateX(-30px); transition: opacity 0.55s, transform 0.7s cubic-bezier(.2,.7,.1,1); }
+  .fitem.cur { opacity: 1; transform: none; }
+  .pop-phase .fitem { opacity: 0 !important; }
+  .fitem .h { margin: 0; width: 1180px; font-weight: 500; font-size: 54px; line-height: 1.16; }
+  .fitem .h b { font-family: var(--font-display); font-weight: 800; font-size: 0.86em; color: var(--ochre); }
+  .fitem .cp { margin: 26px 0 0; width: 1100px; font-size: 28px; line-height: 1.36; color: rgba(255,255,255,0.88); }
+  .fitem .vis { margin-top: 38px; }
+  .fitem .src { font-size: 18px; opacity: 0.55; margin-top: 18px; }
+  .fitem.stmt .h { font-size: 68px; line-height: 1.12; }
+  /* numero grande: solo quando è il numero la notizia */
+  .fitem .num { font-family: var(--font-display); font-weight: 800; font-size: 200px; line-height: 0.95; color: var(--ochre);
+    white-space: nowrap; overflow: hidden; font-variant-numeric: tabular-nums; }
+  .fitem .bigp { font-size: 38px; line-height: 1.34; margin: 34px 0 0; width: 1000px; }
+  /* affiancato: testo a sinistra, grafica a destra */
+  .fitem.side { flex-direction: row; align-items: center; justify-content: flex-start; }
+  .fitem.side .ct { width: 610px; margin-right: 50px; flex: none; }
+  .fitem.side .h { width: 610px; font-size: 46px; }
+  .fitem.side .cp { width: 600px; }
+  .fitem.side .vis { margin-top: 0; }
+  .fitem.dense .vis { margin-top: 26px; }
+  /* barre */
+  .bars { width: 1000px; }
+  .bars .bar { margin-bottom: 20px; }
+  .bars .bar span { display: block; font-size: 25px; color: rgba(255,255,255,0.82); margin-bottom: 8px; }
+  .bars .bar span b { font-family: var(--font-display); font-weight: 700; color: var(--white); }
+  .bars .tr { height: 34px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+  .bars .tr i { display: block; height: 100%; width: 0; background: rgba(255,255,255,0.55); border-radius: 3px; transition: width 1.4s cubic-bezier(.2,.7,.1,1); }
+  .bars .bar.hi .tr i { background: var(--ochre); transition-delay: 0.35s; }
+  .bars .bar.hi span b { color: var(--ochre); }
+  .bars .bar.neg .tr i { background: var(--terra); }
+  .bars .bar.neg span b { color: var(--terra); }
+  .bars .bar.dash .tr { background: transparent; }
+  .bars .bar.dash .tr i { background: transparent; border: 3px dashed rgba(236,174,49,0.8); transition-delay: 0.7s; }
+  /* confronto affiancato */
+  .vs { display: flex; align-items: flex-end; gap: 70px; }
+  .vs .vc { opacity: 0; transform: translateY(16px); transition: opacity 0.6s, transform 0.6s; }
+  .cur .vs .vc { opacity: 1; transform: none; }
+  .vs .vl { font-size: 24px; color: rgba(255,255,255,0.75); margin-bottom: 10px; max-width: 420px; }
+  .vs .vv { font-family: var(--font-display); font-weight: 800; font-size: 88px; line-height: 1; color: rgba(255,255,255,0.7); white-space: nowrap; }
+  .vs .vv.up { color: var(--ochre); }
+  .vs .vv.down { color: var(--terra); }
+  .vs .vv.txt { font-size: 40px; white-space: normal; max-width: 420px; line-height: 1.15; }
+  .vs .vv em { font-style: normal; font-size: 0.6em; margin-right: 10px; }
+  .vs.tre { gap: 56px; }
+  .vs.tre .vv { font-size: 64px; }
+  .vs.tre .vv.txt { font-size: 34px; max-width: 340px; }
+  /* icone ripetute: si accendono una dopo l'altra */
+  .units { line-height: 0; width: 1100px; }
+  .units .u { display: inline-block; vertical-align: bottom; margin: 0 18px 16px 0; color: rgba(255,255,255,0.2); transition: color 0.3s; }
+  .units.tight .u { margin-right: 12px; }
+  .units .u svg { display: block; fill: currentColor; }
+  .cur .units .u.lit { color: var(--ochre); }
+  .units .bt { display: block; position: relative; width: 46px; height: 22px; border: 2px solid currentColor; border-radius: 4px; transition: background 0.3s, box-shadow 0.3s; transition-delay: inherit; }
+  .units .bt::after { content: ""; position: absolute; right: -6px; top: 5px; width: 3px; height: 8px; background: currentColor; border-radius: 0 2px 2px 0; }
+  .cur .units .u.lit .bt { background: var(--ochre); box-shadow: 0 0 8px rgba(236,174,49,0.45); }
+  .units .extra { display: flex; align-items: center; margin-top: 22px; line-height: 1.3; }
+  .units .extra .bt { color: rgba(255,255,255,0.6); margin-right: 22px; }
+  .units .extra .bt em { position: absolute; left: 2px; top: 2px; bottom: 2px; background: var(--ochre); }
+  .units .extra span { font-size: 25px; color: rgba(255,255,255,0.82); }
+  /* X su 100 */
+  .waf { width: 400px; line-height: 0; }
+  .waf i { display: inline-block; width: 34px; height: 34px; margin: 0 6px 6px 0; border-radius: 4px; background: rgba(255,255,255,0.1); transition: background 0.25s, box-shadow 0.25s; }
+  .cur .waf i.lit { background: var(--ochre); box-shadow: 0 0 8px rgba(236,174,49,0.35); }
+  .cur .waf.coral i.lit { background: var(--terra); box-shadow: 0 0 8px rgba(225,142,116,0.35); }
+  /* linea del tempo */
+  .tl { position: relative; display: flex; width: 1180px; }
+  .tl::before { content: ""; position: absolute; top: 9px; left: 0; right: 0; height: 2px; background: rgba(255,255,255,0.25); }
+  .tl .ev { position: relative; padding-right: 44px; opacity: 0; transform: translateY(14px); transition: opacity 0.6s, transform 0.6s; }
+  .cur .tl .ev { opacity: 1; transform: none; }
+  .tl .dot { width: 20px; height: 20px; border-radius: 50%; background: var(--ochre); margin-bottom: 20px; }
+  .tl .when { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: var(--ochre); }
+  .tl .ev.last .dot { background: var(--terra); }
+  .tl .ev.last .when { color: var(--terra); }
+  .tl .what { font-size: 27px; line-height: 1.32; margin-top: 10px; }
+  /* passaggi in fila */
+  .flow { display: flex; align-items: center; }
+  .flow .st { width: 310px; min-height: 124px; padding: 22px 26px; border: 2px solid rgba(255,255,255,0.28); border-radius: 10px; font-size: 27px; line-height: 1.25; opacity: 0; transition: opacity 0.6s; }
+  .flow .st b { display: block; font-family: var(--font-display); font-weight: 800; font-size: 32px; color: var(--ochre); margin-bottom: 4px; }
+  .flow .st.last { border-color: var(--terra); }
+  .flow .st.last b { color: var(--terra); }
+  .flow .ar { font-family: var(--font-display); font-size: 40px; color: var(--ochre); margin: 0 20px; opacity: 0; transition: opacity 0.4s; }
+  .cur .flow .st, .cur .flow .ar { opacity: 1; }
+  /* due falsi col timbro */
+  .cards { display: flex; gap: 40px; }
+  .cards .cd { position: relative; width: 520px; padding: 30px 34px; background: rgba(23,24,24,0.35); border: 1px solid var(--wire); border-radius: 10px; }
+  .cards .cd h6 { margin: 0; width: 290px; font-size: 32px; font-weight: 500; line-height: 1.2; }
+  .cards .cd p { margin: 12px 0 0; font-size: 22px; color: rgba(255,255,255,0.7); }
+  .cards .stamp { position: absolute; right: 26px; top: 26px; font-family: var(--font-display); font-weight: 800; font-size: 30px; color: var(--terra);
+    border: 4px solid var(--terra); border-radius: 6px; padding: 4px 12px; transform: rotate(-12deg) scale(2); opacity: 0;
+    transition: opacity 0.25s, transform 0.35s cubic-bezier(.3,1.6,.5,1); }
+  .cur .cards .stamp { opacity: 1; transform: rotate(-12deg) scale(1); }
+  /* cerchio percentuale */
+  .donut text { font-family: var(--font-display); font-weight: 800; fill: var(--white); }
+  .donut .arc { stroke: var(--terra); transition: stroke-dashoffset 1.6s cubic-bezier(.2,.7,.1,1) 0.3s; }
+  /* cronometro */
+  .timer { width: 560px; padding: 34px 40px; border: 2px solid rgba(255,255,255,0.28); border-radius: 14px; }
+  .timer .tt { font-family: var(--font-display); font-weight: 800; font-size: 84px; color: var(--ochre); line-height: 1; white-space: nowrap; }
+  .timer .tr { height: 16px; margin-top: 26px; background: rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden; }
+  .timer .tr i { display: block; height: 100%; width: 0; background: var(--ochre); transition: width 3s linear 0.2s; }
+  .timer .ts { font-size: 22px; color: rgba(255,255,255,0.7); margin-top: 14px; }
+  /* mappa */
+  .map { overflow: visible; }
+  .map .land { fill: rgba(255,255,255,0.09); stroke: rgba(255,255,255,0.35); stroke-width: 1.5; }
+  .map .pt { opacity: 0; transition: opacity 0.5s; }
+  .cur .map .pt { opacity: 1; }
+  .map .pt circle { fill: var(--ochre); }
+  .map .pt.you circle { fill: var(--terra); }
+  .map .pt .alone { fill: none; stroke: var(--terra); stroke-width: 3; }
+  .map .pt text { font-family: var(--font-serif); font-size: 21px; fill: var(--white); }
+  .map .pt.you text { fill: var(--terra); font-weight: 500; }
+  /* l'interruttore che fa sparire le persone */
+  .tg { width: 540px; }
+  .tg .room { position: relative; height: 280px; border-radius: 14px; overflow: hidden; background: linear-gradient(180deg, #3f6e78, var(--bg-slate) 60%, #6f7a4c); }
+  .tg .room::before { content: ""; position: absolute; left: -10%; right: -10%; bottom: 0; height: 46%; background: radial-gradient(ellipse at 50% 100%, rgba(236,174,49,0.35), transparent 70%); }
+  .tg .pp { position: absolute; bottom: 0; color: var(--white); transition: opacity 0.8s 1.8s; }
+  .cur .tg .pp { opacity: 0; }
+  .tg .pp svg { display: block; fill: currentColor; }
+  .tg .sw { display: flex; align-items: center; justify-content: space-between; margin-top: 22px; padding: 18px 24px; background: rgba(23,24,24,0.45); border-radius: 14px; font-size: 28px; }
+  .tg .sw-r { display: flex; align-items: center; }
+  .tg .knobw { position: relative; width: 84px; height: 46px; border-radius: 23px; background: var(--ochre); transition: background 0.3s 1.2s; }
+  .tg .knobw i { position: absolute; top: 4px; left: 42px; width: 38px; height: 38px; border-radius: 50%; background: var(--white); transition: left 0.3s 1.2s; }
+  .cur .tg .knobw { background: rgba(255,255,255,0.25); }
+  .cur .tg .knobw i { left: 4px; }
+  .tg .state { font-family: var(--font-display); font-size: 18px; color: var(--terra); opacity: 0; transition: opacity 0.3s 1.3s; margin-right: 16px; }
+  .cur .tg .state { opacity: 1; }
+  /* «paghi o acconsenti» */
+  .dlg { width: 520px; padding: 34px 34px 30px; background: rgba(23,24,24,0.55); border: 1px solid var(--wire); border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+  .dlg .dt { font-size: 28px; font-weight: 500; line-height: 1.25; margin-bottom: 26px; }
+  .dlg .op { padding: 18px 22px; border-radius: 40px; text-align: center; font-size: 24px; margin-top: 14px; }
+  .dlg .op.a { background: var(--white); color: var(--bg-slate); font-weight: 500; text-shadow: none; }
+  .dlg .op.b { border: 2px solid rgba(255,255,255,0.5); }
+  .dlg .op.b small { display: block; font-size: 18px; opacity: 0.7; }
+  /* il feed che diventa triste */
+  .feed { width: 330px; line-height: 0; }
+  .feed i { display: inline-block; width: 26px; height: 44px; margin: 0 6px 6px 0; border-radius: 3px; transition: background 0.25s; }
+  .feed i.f0 { background: #5f7d84; } .feed i.f1 { background: #8a8762; } .feed i.f2 { background: #5d7a68; } .feed i.f3 { background: #9a7e58; } .feed i.f4 { background: #6b6f8c; }
+  .cur .feed i.sad { background: var(--terra); }
+  /* acquisti: da «confermato da te» a «in automatico» */
+  .cf { width: 560px; }
+  .cf .row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.14); font-size: 26px; opacity: 0; transition: opacity 0.5s; }
+  .cur .cf .row { opacity: 1; }
+  .cf .row em { font-style: normal; font-size: 18px; padding: 7px 14px; border-radius: 20px; white-space: nowrap; }
+  .cf .row.ask em { border: 2px solid rgba(255,255,255,0.5); }
+  .cf .row.auto em { background: var(--terra); color: var(--bg-black); font-weight: 500; text-shadow: none; }
+  /* giornata scolastica */
+  .giorno { display: flex; width: 1180px; }
+  .giorno .sg { padding-right: 8px; }
+  .giorno .blk { height: 64px; border-radius: 6px; background: rgba(255,255,255,0.1); border: 2px dashed rgba(255,255,255,0.3); }
+  .giorno .sg.hi .blk { background: var(--ochre); border: 0; }
+  .giorno .sg span { display: block; margin-top: 14px; font-size: 25px; line-height: 1.3; }
+  .giorno .sg.hi span { color: var(--ochre); font-weight: 500; }
+  /* due liste */
+  .fitem .lists { display: flex; gap: 50px; }
+  .fitem .lists > div { width: 470px; }
+  .fitem .lists h5 { margin: 0 0 10px; font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: 0.04em; color: var(--ochre); }
+  .fitem .lists .no h5 { color: var(--terra); }
+  .fitem .lists ul { margin: 0; padding: 0; list-style: none; }
+  .fitem .lists li { font-size: 23px; line-height: 1.28; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  /* cosa sappiamo oggi: una riga per ogni dato già passato */
+  .f-log { position: absolute; left: 1380px; top: 380px; width: 456px; }
+  .f-log h4 { margin: 0 0 18px; font-weight: 400; font-style: italic; font-size: 24px; color: rgba(255,255,255,0.78); border-bottom: 1px solid var(--wire); padding-bottom: 14px; }
+  .litem { display: flex; align-items: baseline; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.08);
+    opacity: 0; transform: translateY(-12px); transition: opacity 0.5s 0.15s, transform 0.6s 0.15s; }
+  .litem.on { opacity: 1; transform: none; }
+  .litem b { font-family: var(--font-display); font-weight: 800; font-size: 26px; color: var(--ochre); min-width: 150px; margin-right: 16px; white-space: nowrap; }
+  .litem span { font-size: 19px; line-height: 1.3; color: rgba(255,255,255,0.85); }
+  /* il futuro immaginato: le locandine, una per «Avanti» */
+  .f-pops { position: absolute; inset: 0; opacity: 0; transition: opacity 0.6s; }
+  .pop-phase .f-pops { opacity: 1; }
+  .f-pops .ph { font-style: italic; font-size: 30px; color: #f3c3b3; border-left: 3px solid var(--terra); padding-left: 20px; }
+  .f-pop { position: absolute; top: 70px; width: 380px; opacity: 0; transform: translateY(30px); transition: opacity 0.7s, transform 0.8s cubic-bezier(.2,.7,.1,1); }
+  .f-pop.on { opacity: 1; transform: none; }
+  .f-pop .poster { position: relative; width: 220px; height: 326px; border-radius: 4px; overflow: hidden; background: rgba(35,62,77,0.55); box-shadow: 0 14px 34px rgba(0,0,0,0.38);
+    display: flex; align-items: center; justify-content: center; text-align: center; padding: 16px;
+    font-family: var(--font-display); font-weight: 700; font-size: 18px; line-height: 1.2; color: #f3c3b3; }
+  .f-pop .poster:not(:has(img)) { border: 2px dashed rgba(225,142,116,0.75); }   /* locandina mancante: resta il titolo */
+  .f-pop .poster img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .f-pop .meta { font-size: 19px; opacity: 0.72; margin-top: 20px; }
+  .f-pop h3 { font-family: var(--font-display); font-weight: 700; font-size: 28px; line-height: 1.1; margin: 6px 0 12px; }
+  .f-pop .sum { font-size: 24px; line-height: 1.38; margin: 0; }
 </style>
 </head>
 <body>
@@ -149,6 +431,76 @@
   <div><span class="count" id="lobbyCount">0</span> <span class="muted">lettori collegati</span></div>
 </div>
 
+<!-- INTRO — tra il QR e il capitolo 1, una slide per «Avanti» del regista.
+     I passi sono contati in server/content.js (INTRO_PASSI): se ne aggiungi
+     uno qui, aggiornalo anche lì. -->
+<div id="intro" class="slide hidden">
+  <div class="stage" id="sSpeaker">
+    <div class="head"><h1 class="fit">Speaker</h1></div>
+    <div class="people">
+      <div class="person">
+        <img src="img/andrea.png" alt="">
+        <h2 class="fit">Andrea Della Maggiore</h2>
+        <p class="role">Project manager <b>@ Hastega</b> dal 2018</p>
+        <div class="lists">
+          <div class="list yes"><h3>Cosa piace ad Andrea</h3>
+            <ul><li>la storia</li><li>la fantascienza</li><li>lamentarsi</li></ul></div>
+          <div class="list no"><h3>Cosa non piace ad Andrea</h3>
+            <ul><li>il rumore delle saracinesche che si chiudono</li><li>la gente che gli mette fretta</li><li>gli ignoranti</li></ul></div>
+        </div>
+      </div>
+      <div class="person">
+        <img src="img/paolo.png" alt="">
+        <h2 class="fit">Paolo Micheletti</h2>
+        <p class="role">Developer <b>@ Hastega</b> dal 2020</p>
+        <div class="lists">
+          <!-- da compilare: ogni <li class="empty"></li> diventa <li>il testo</li> -->
+          <div class="list yes"><h3>Cosa piace a Paolo</h3>
+            <ul><li class="empty"></li><li class="empty"></li><li class="empty"></li></ul></div>
+          <div class="list no"><h3>Cosa non piace a Paolo</h3>
+            <ul><li class="empty"></li><li class="empty"></li><li class="empty"></li></ul></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage hidden" id="sRegole">
+    <div class="head"><h1 class="fit">Manuale d'istruzioni</h1></div>
+    <div class="sec rules-h">Regole</div>
+    <div class="rules">
+      <div class="rule" data-step="1"><div class="n">1</div><h2>È un esperimento interattivo.</h2>
+        <p>In alcuni momenti vi chiederemo di usare il telefono, per votare. Negli altri momenti il telefono <em>NON</em> si usa.</p></div>
+      <div class="rule" data-step="2"><div class="n">2</div><h2>Non vi interessa? Nessun problema.</h2>
+        <p>Basta che non disturbiate chi invece vuole ascoltare.</p></div>
+      <div class="rule" data-step="3"><div class="n">3</div><h2>Il ritmo è serrato.</h2>
+        <p>Gli argomenti sono tanti, e non sempre semplici. Per questo ci saranno dei momenti di <span class="red">casino autorizzato</span>: non sono vere pause. L'unica regola è restare <u>seduti al vostro posto</u>.</p></div>
+      <div class="rule" data-step="4"><div class="n">4</div><h2>A metà, una pausa lunga.</h2>
+        <p>Quella sì, è una pausa vera: andate dove volete. Basta tornare all'orario stabilito e rimettervi a sedere.</p></div>
+      <div class="rule ask" data-step="5"><div class="n">5</div><h2>Aiutateci ad arrivare in fondo.</h2>
+        <p>Questo viaggio è un esperimento che senza di voi non potremmo fare. Vi chiediamo questo sforzo.</p></div>
+    </div>
+    <!-- il programma, al passo dopo l'ultima regola -->
+    <div class="sec prog-h">Programma</div>
+    <div class="day">
+      <div class="track-p">
+        <div class="seg open" style="width:11%"><div class="bar"></div><div class="name">Apertura</div><div class="sub">Come si gioca</div></div>
+        <div class="seg cap" style="width:33%"><div class="phones" data-n="7"></div>
+          <div class="bar"><span class="tk" style="left:33.3%"></span><span class="tk" style="left:66.6%"></span></div>
+          <div class="name">Capitoli 1-7</div><div class="sub">Dal 2027 al 2033</div></div>
+        <div class="seg brk" style="width:13%"><div class="bar"></div><div class="name">Pausa lunga</div><div class="sub">Liberi di uscire</div></div>
+        <div class="seg cap" style="width:33%"><div class="phones" data-n="5"></div>
+          <div class="bar"><span class="tk" style="left:33.3%"></span><span class="tk" style="left:66.6%"></span></div>
+          <div class="name">Capitoli 8-13</div><div class="sub">Dal 2034 al 2039</div></div>
+        <div class="seg end" style="width:10%"><div class="phones" data-n="1"></div><div class="bar"></div><div class="name">Finale</div><div class="sub">2040: una pagina per voi</div></div>
+      </div>
+      <div class="legend"><i></i>casino autorizzato, seduti al vostro posto <b></b>pausa lunga, liberi di uscire</div>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTRO — i dati del capitolo, prima del voto. Lo scrive main.js. -->
+<div id="registro" class="slide hidden"></div>
+
 <!-- GIOCO -->
 <div id="game" class="layout wrap hidden">
   <main id="col">
@@ -158,7 +510,7 @@
 
     <div id="voteArea" class="hidden">
       <h2 id="voteQ" style="font-size:clamp(1.5rem,3vw,2.4rem)"></h2>
-      <div class="votebar"><i id="voteFill"></i></div>
+      <div class="voterow"><div class="votebar"><i id="voteFill"></i></div><b id="voteSec"></b></div>
       <!-- a live spento è qui che la sala vede che si sta votando, senza sapere da che parte -->
       <div class="muted" id="voteCount"></div>
       <div class="poles">

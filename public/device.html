@@ -6,21 +6,44 @@
 <title>Il Libro Vivo del 2040</title>
 <link rel="stylesheet" href="style.css">
 <style>
+  /* ponytail: un solo moltiplicatore per tutti i testi in rem del telefono */
+  html { font-size: 110%; }
   body { display: flex; }
   .screen { position: relative; z-index: 2; margin: auto; width: 100%; max-width: 520px; min-height: 100vh; padding: var(--sp-lg) var(--sp-md); display: flex; flex-direction: column; justify-content: center; gap: var(--sp-md); }
   /* L'epilogo è più alto del viewport, e in flexbox un contenuto centrato che
      trabocca si taglia IN CIMA — cioè proprio la prima riga. Da lì in poi si
      parte dall'alto. */
-  body.fine .screen { justify-content: flex-start; }
+  body.fine .screen { justify-content: flex-start; padding-bottom: 104px; }   /* spazio per il pulsante condividi */
   .wait { text-align: center; }
   .wait .display { font-size: 1.6rem; color: var(--ochre); margin-bottom: var(--sp-sm); }
   .vote-opt { width: 100%; text-align: left; font-family: var(--font-serif); text-transform: none; letter-spacing: 0; font-size: 1.1rem; padding: var(--sp-md); line-height: 1.4; }
   .vote-opt.picked { background: var(--ochre); color: var(--bg-black); }
-  #timerNote { text-align: center; }
-  /* quanto resta per cambiare idea: una barra, senza cifre che mettano fretta */
-  .votebar { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.12); overflow: hidden; margin-top: var(--sp-md); }
+  .vote-opt + .vote-opt { margin-top: var(--sp-sm); }
+  /* cosa guadagni / cosa paghi, come sul ledwall: dentro il bottone, così si tocca tutto */
+  .vote-opt .gc { display: block; margin-top: 0.7em; font-size: 0.85rem; opacity: 0.85; }
+  .vote-opt .gc b { display: block; font-family: var(--font-display); font-weight: 700; font-size: 0.6rem;
+    letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 0.2em; }
+  /* quanto resta per cambiare idea: la barra e i secondi */
+  .voterow { display: flex; align-items: center; gap: var(--sp-sm); margin-top: var(--sp-md); }
+  .votebar { flex: 1; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.12); overflow: hidden; }
   .votebar > i { display: block; height: 100%; width: 100%; background: var(--ochre);
     transform-origin: left center; transition: transform 0.2s linear; }
+  #voteSec { font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; color: var(--ochre);
+    font-variant-numeric: tabular-nums; min-width: 2.4ch; text-align: right; }
+  /* la card dell'intreccio appena saldato: le due scelte, poi l'esito */
+  #esitoBox .dec { border: 1px solid var(--wire); border-radius: 8px; padding: 0.6em 0.9em; margin: 0.5em 0; font-size: 0.95rem; }
+  #esitoBox .dec .year { display: block; color: var(--muted); font-size: 0.65rem; margin-bottom: 0.3em; }
+  #esitoBox .fired .nome { font-size: 1.1rem; }
+  #esitoBox > * { animation: entra 0.6s ease-out both; }
+  #esitoBox > :nth-child(2) { animation-delay: 0.3s; } #esitoBox > :nth-child(3) { animation-delay: 0.6s; }
+  #esitoBox > :nth-child(4) { animation-delay: 1.1s; }
+  @keyframes entra { from { opacity: 0; transform: translateY(14px); } }
+  @media (prefers-reduced-motion: reduce) { #esitoBox > * { animation: none; } }
+  /* condividi: sempre a portata di pollice mentre si legge l'epilogo */
+  .fab { position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 5;
+    width: 56px; height: 56px; border-radius: 50%; border: 0; background: var(--ochre); color: var(--bg-black);
+    display: grid; place-items: center; box-shadow: 0 6px 20px rgba(0,0,0,0.35); cursor: pointer; }
+  .azioni { display: flex; flex-wrap: wrap; gap: var(--sp-sm); }
   /* accoglienza */
   .campo { display: block; margin: var(--sp-md) 0; font-size: 0.9rem; color: var(--muted); }
   .campo input { display: block; width: 100%; margin-top: 0.5em; padding: var(--sp-sm);
@@ -42,10 +65,11 @@
     gap: 0.15em 0; align-items: center; margin-top: var(--sp-sm); }
   .griglia .et { font-family: var(--font-display); font-weight: 700; font-size: 0.6rem;
     letter-spacing: 0.14em; color: var(--muted); padding-right: 0.6em; }
+  /* in testa il numero del capitolo; le lettere senza colore: il colore non
+     deve dire quale strada era la comoda */
+  .griglia .num { font-family: var(--font-display); font-size: 0.6rem; color: var(--muted); text-align: center; }
   .griglia i { font-style: normal; font-family: var(--font-display); font-weight: 800;
-    font-size: 1.05rem; text-align: center; line-height: 1.5; border-radius: 5px; }
-  .griglia i.facile { color: var(--terra); }
-  .griglia i.difficile { color: var(--ochre); }
+    font-size: 0.95rem; text-align: center; line-height: 1.6; border-radius: 5px; }
   .griglia i.saltato { color: var(--wire); }
   /* dove è andato per conto suo: l'unica cosa evidenziata */
   .griglia i.diverso { background: rgba(255,255,255,0.14); outline: 1px solid var(--white); }
@@ -83,9 +107,12 @@
     <div class="year">La storia si è fermata</div>
     <h2 id="q" style="font-size:1.4rem"></h2>
     <div id="opts"></div>
-    <div class="votebar"><i id="voteFill"></i></div>
+    <div class="voterow"><div class="votebar"><i id="voteFill"></i></div><b id="voteSec"></b></div>
     <p id="voteNote" class="muted hidden" style="text-align:center">Voto registrato. Puoi ancora cambiare idea.</p>
   </div>
+
+  <!-- intreccio saldato: la stessa card del ledwall, solo quando un esito si chiude -->
+  <div id="esitoBox" class="hidden"></div>
 
   <!-- EPILOGO — impaginato come un capitolo, in verticale:
        il testo, poi lo specchietto delle sue scelte, poi il mondo della sala. -->
@@ -93,7 +120,10 @@
     <div class="year">2040 · Lo specchio</div>
     <h2 style="font-size:1.6rem">Il tuo 2040</h2>
     <p id="epilogo" class="epilogo hidden"></p>
-    <a id="epilogoLink" class="btn hidden" style="display:none">Tieni questo link</a>
+    <div class="azioni">
+      <a id="epilogoLink" class="btn hidden" style="display:none">Tieni questo link</a>
+      <button id="bStory" class="btn hidden" type="button">Story Instagram</button>
+    </div>
 
     <!-- specchietto: cosa ha scelto lui, capitolo per capitolo -->
     <section class="sez">
@@ -111,6 +141,13 @@
     </section>
   </div>
 </div>
+
+<button id="bCondividi" class="fab hidden" type="button" aria-label="Condividi il tuo 2040">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>
+  </svg>
+</button>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="device.js"></script>
